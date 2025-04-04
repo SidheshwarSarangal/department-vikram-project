@@ -8,8 +8,12 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const app = express();
 const dotenv = require("dotenv")
+
+
 const routes = require("./api/routes/index")
 const router = require("express").Router();
+
+
 dotenv.config();
 
 ///original connection

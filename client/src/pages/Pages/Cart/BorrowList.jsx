@@ -5,8 +5,29 @@ import { useNavigate } from "react-router-dom";
 const BorrowList = () => {
   const [data, setData] = useState([]);
   const [selectedBooks, setSelectedBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [cartBooks, setCartBooks] = useState([]);
+
+
   const navigate = useNavigate();
   console.log(data);
+
+
+  const fetchCartBooks = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/allBooksInCart");
+      console.log(response.data.books);
+      if (Array.isArray(response.data.books)) {
+        setCartBooks(response.data.books);
+      } else {
+        setCartBooks([]);
+      }
+    } catch (err) {
+      console.error("Error fetching cart books:", err);
+      setCartBooks([]);
+    }
+  };
+
 
   const addToCart = async () => {
     //   const books = selectedBooks;
@@ -25,16 +46,33 @@ const BorrowList = () => {
   // console.log(selectedBooks);
 
   const fetchData = async () => {
-    // setInterval(async () => {
-    const response = await axios.get("http://localhost:5000/borrowedBooks");
-    setData(response.data);
-    // }, 1500);
-    console.log(response.data);
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:5000/borrowedBooks");
+      if (Array.isArray(response.data)) {
+        setData(response.data);
+      } else if (Array.isArray(response.data.borrowedBooks)) {
+        setData(response.data.borrowedBooks);
+      } else {
+        console.warn("Unexpected format:", response.data);
+        setData([]);
+      }
+    } catch (err) {
+      console.error("Error fetching borrowed books:", err);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
   };
-  // console.log(data);
+
+
   useEffect(() => {
     fetchData();
+    fetchCartBooks();
   }, []);
+
+
+
 
   function formatDate(dateStr) {
     const currentDate = new Date();
@@ -88,7 +126,6 @@ const BorrowList = () => {
     <div
       style={{
         display: "flex",
-        // border: "1px solid grey",
         boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
         flexDirection: "column",
         justifyContent: "center",
@@ -97,42 +134,85 @@ const BorrowList = () => {
         padding: "0.5rem",
       }}
     >
-      {data.length > 0 ? (
+      <div style={{ marginBottom: "2rem", paddingInlineStart: "5rem" }}>
+        <h3>🛒 Check List</h3>
+
+        {cartBooks.length > 0 ? (
+          <table className="table">
+            <thead style={{ backgroundColor: "#ee6c4d", color: "white" }}>
+              <tr>
+                <th style={{ width: "5rem", textAlign: "left" }}>#</th>
+                <th style={{ width: "15rem", textAlign: "left" }}>User ID</th>
+                <th style={{ width: "15rem", textAlign: "left" }}>Genre</th>
+                <th style={{ width: "20rem", textAlign: "left" }}>Title</th>
+                <th style={{ width: "15rem", textAlign: "left" }}>Publisher</th>
+                <th style={{ width: "10rem", textAlign: "left" }}>Item Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cartBooks.map((book, index) => (
+                <tr key={book._id || index}>
+                  <td>{index + 1}</td>
+                  <td>{book.userId}</td>
+                  <td>{book.Genre}</td>
+                  <td>{book.Title}</td>
+                  <td>{book.Publisher}</td>
+                  <td>{book.ItemCount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div style={{ textAlign: "center", fontSize: "1.2rem", padding: "1rem" }}>
+            📭 No books to check out
+          </div>
+        )}
+      </div>
+
+
+      {loading ? (
+        <div className="loaders book">
+          <figure className="page"></figure>
+          <figure className="page"></figure>
+          <figure className="page"></figure>
+        </div>
+      ) : data.length === 0 ? (
+        <div style={{ textAlign: "center", fontSize: "1.5rem", padding: "2rem" }}>
+          📚 Nothing in Checklist
+        </div>
+      ) : (
         <>
           <div>
             <img
               className="vert-move"
-              style={{
-                width: "40%",
-                marginLeft: "30%",
-                // marginRight: "50%",
-                // height: "30%",
-              }}
+              style={{ width: "40%", marginLeft: "30%" }}
               src="https://raw.githubusercontent.com/AnuragRoshan/images/71611a64e2b0acde9f0527b4f2341fabd7bf9555/undraw_process_re_gws7.svg"
               alt=""
-              srcSet=""
             />
           </div>
+
           <div style={{ justifyContent: "center", paddingInlineStart: "5rem" }}>
             <table className="table">
               <thead style={{ backgroundColor: "#3d5a80", color: "white" }}>
-                <th style={{ width: "5rem", textAlign: "left" }}>#</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Borrower</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Book Name</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Author</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Due/Borrowed Date</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Returned</th>
+                <tr>
+                  <th style={{ width: "5rem", textAlign: "left" }}>#</th>
+                  <th style={{ width: "15rem", textAlign: "left" }}>Borrower</th>
+                  <th style={{ width: "15rem", textAlign: "left" }}>Book Name</th>
+                  <th style={{ width: "15rem", textAlign: "left" }}>Author</th>
+                  <th style={{ width: "15rem", textAlign: "left" }}>
+                    Due/Borrowed Date
+                  </th>
+                  <th style={{ width: "15rem", textAlign: "left" }}>Returned</th>
+                </tr>
               </thead>
               <tbody>
                 {record.map((d, i) => (
-                  <tr>
-                    <td style={{}}>{(currentPage - 1) * 10 + i + 1}</td>
+                  <tr key={d.isbn || i}>
+                    <td>{(currentPage - 1) * 10 + i + 1}</td>
                     <td style={{ padding: "0.5rem" }}>{d.borrower}</td>
                     <td style={{ padding: "0.5rem" }}>{d.title}</td>
                     <td style={{ padding: "0.5rem" }}>{d.author}</td>
-                    <td style={{ padding: "0.5rem" }}>
-                      {formatDate(d.takenDate)}
-                    </td>
+                    <td style={{ padding: "0.5rem" }}>{formatDate(d.takenDate)}</td>
                     <td style={{ padding: "0.5rem" }}>
                       <input
                         type="checkbox"
@@ -145,6 +225,7 @@ const BorrowList = () => {
               </tbody>
             </table>
           </div>
+
           <div
             style={{
               textAlign: "center",
@@ -168,6 +249,7 @@ const BorrowList = () => {
             </div>
 
             <div style={{ paddingBlockStart: "1rem" }}>{currentPage}</div>
+
             <div
               className="land-button"
               style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
@@ -181,23 +263,10 @@ const BorrowList = () => {
               </a>
             </div>
           </div>
-          <div
-            style={{
-              marginLeft: "45rem",
-              // marginBlockEnd: "2rem",
-            }}
-          >
-            <div
-              className="land-button"
-              style={{ cursor: "pointer" }}
-              onClick={addToCart}
-            >
-              <a
-                className="landing-button-hover"
-                style={{
-                  width: "12  rem",
-                }}
-              >
+
+          <div style={{ marginLeft: "45rem" }}>
+            <div className="land-button" style={{ cursor: "pointer" }} onClick={addToCart}>
+              <a className="landing-button-hover" style={{ width: "12rem" }}>
                 <span>SAVE CHANGE</span>
               </a>
             </div>
@@ -206,15 +275,10 @@ const BorrowList = () => {
             </div>
           </div>
         </>
-      ) : (
-        <div className="loaders book">
-          <figure className="page"></figure>
-          <figure className="page"></figure>
-          <figure className="page"></figure>
-        </div>
       )}
     </div>
   );
+
 };
 
 export default BorrowList;

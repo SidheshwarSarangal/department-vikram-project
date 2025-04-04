@@ -21,17 +21,18 @@ const Lists = ({ user }) => {
 
   const addToCartCaller = async (send) => {
     try {
-      await axios
-        .post(`http://localhost:5000/addToCart`, send, {})
-        .then((response) => {
-          console.log(response);
-        });
-
+      const response = await axios.post("http://localhost:5000/addToCart", send);
+      console.log("Response from server:", response.data);
       return { result: true, message: "added to cart" };
     } catch (error) {
-      return { result: false, message: "request failed to add" };
+      const errorMsg =
+        error.response?.data?.msg || "Request failed to add to cart";
+      console.error("Error response:", errorMsg);
+      return { result: false, message: errorMsg };
     }
   };
+
+
 
   const addToCart = async () => {
     const books = selectedBooks;
@@ -41,8 +42,9 @@ const Lists = ({ user }) => {
     if (result) {
       window.location.href = "/Cart";
     } else {
-      alert(message);
+      alert(message); // Will now show: "Book with ISBN 9780743273565 is out of stock"
     }
+
   };
   // console.log(selectedBooks);
 
@@ -90,7 +92,7 @@ const Lists = ({ user }) => {
   // console.log(data);
 
 
-  
+
   useEffect(() => {
     let delayTimer;
     const handleFilterChange = () => {

@@ -44,24 +44,36 @@ exports.getAllBooks = async (req, res) => {
     }
 };
 
+
 exports.searchBooks = async (req, res) => {
     try {
         const searchText = req.params.id;
-        if (searchText == "-") {
+        if (searchText === "-") {
             const books = await bookSchema.find();
             return res.status(200).json({ books });
         }
-        const regex = new RegExp(searchText, 'i'); // 'i' flag for case-insensitive search
-        const books = await bookSchema.find({ Title: { $regex: regex } }).limit(4);
+
+        const regex = new RegExp(searchText, 'i'); // case-insensitive regex
+
+        const books = await bookSchema.find({
+            $or: [
+                { Title: { $regex: regex } },
+                { Author: { $regex: regex } }, // Make sure this field exists in your schema
+                { Genre: { $regex: regex } }   // Same here
+            ]
+        });
+
         res.status(200).json({ books });
     } catch (error) {
-        throw error;
+        console.error("Search error:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 
 
+
 exports.addToCart = async (req, res) => {
-    
+
     try {
         console.log("trying to add on cart")
         const { username } = req.body;
@@ -81,12 +93,12 @@ exports.addToCart = async (req, res) => {
             const ISBN = books[i];
             console.log("this is the index", i)
             console.log(ISBN)
-            const book = await bookSchema.findOne({ISBN});
+            const book = await bookSchema.findOne({ ISBN });
             console.log("this is the book", book)
             if (!book) {
                 return res.status(400).json({ msg: `Book with ISBN ${ISBN} not found` });
             }
-                console.log(book)
+            console.log(book)
             if (book.ItemCount > 0) {
                 // Decrease item count of the book
                 // book.ItemCount -= 1;
@@ -315,6 +327,37 @@ exports.booksInCart = async (req, res) => {
         return res.status(500).json({ msg: "Internal Server Error" });
     }
 };
+
+exports.allBooksInCart = async (req, res) => {
+    try {
+        const users = await userSchema.find();
+
+        const allCartBooks = [];
+
+        for (const user of users) {
+            if (user.cart && user.cart.length > 0) {
+                const isbnList = user.cart.map(book => book.isbn);
+
+                const books = await bookSchema.find({ ISBN: { $in: isbnList } });
+
+                // Attach user info to each book
+                const booksWithUser = books.map(book => ({
+                    ...book._doc,
+                    username: user.username,
+                    userId: user._id,
+                }));
+
+                allCartBooks.push(...booksWithUser);
+            }
+        }
+
+        return res.status(200).json({ books: allCartBooks });
+    } catch (error) {
+        console.error("Error fetching all cart books:", error);
+        return res.status(500).json({ msg: "Internal Server Error" });
+    }
+};
+
 
 exports.borrowedBooks = async (req, res) => {
     try {

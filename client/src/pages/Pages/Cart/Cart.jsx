@@ -5,6 +5,8 @@ import "../../Assets/css/cart.css";
 const Cart = ({ user }) => {
   const [data, setData] = useState([null]);
   const [isLoading, setIsLoading] = useState(true); // Add isLoading state
+  const [borrowedBooks, setBorrowedBooks] = useState([]);
+
 
   const fetchData = async () => {
     try {
@@ -24,6 +26,24 @@ const Cart = ({ user }) => {
   };
 
 
+  const fetchBorrowedBooks = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/borrowedBooks`);
+      console.log(response.data);
+      console.log(user.uniqueId);
+      const userBooks = response.data.filter((book) => {
+        console.log("uid", book.uid);
+        return book.uid === user.uniqueId;
+      });
+
+      setBorrowedBooks(userBooks);
+    } catch (error) {
+      console.error("Error fetching borrowed books:", error);
+      setBorrowedBooks([]);
+    }
+  };
+
+
   const proceedCheckout = async () => {
     const username = user.username;
     const send = { username: username };
@@ -39,6 +59,9 @@ const Cart = ({ user }) => {
 
   useEffect(() => {
     fetchData();
+    fetchBorrowedBooks();
+    console.log("borrowed books", borrowedBooks)
+
   }, []); // Empty dependency array ensures it runs only once when the component mounts.
 
 
@@ -145,6 +168,55 @@ const Cart = ({ user }) => {
                 </div>
               </>
             )}
+            <div style={{ padding: "2rem" }}>
+              <div style={{ fontFamily: "poppins", fontSize: "2rem", marginBottom: "1rem" }}>
+                Borrowed Books
+              </div>
+              {borrowedBooks.length === 0 ? (
+                <div style={{ fontFamily: "poppins", fontSize: "1.2rem", color: "gray" }}>
+                  No books borrowed
+                </div>
+              ) : (
+                borrowedBooks.map((book, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      width: "100%",
+                      border: "1px solid transparent",
+                      backgroundColor: "black",
+                      marginBlockEnd: "1rem",
+                    }}
+                  >
+                    <div>
+                      <img
+                        src="https://covers.openlibrary.org/b/isbn/1933988746-L.jpg"
+                        alt=""
+                        style={{
+                          width: "5rem",
+                          height: "6rem",
+                          marginTop: "0rem",
+                          padding: "0.4rem 1rem",
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: "poppins",
+                        padding: "0.4rem 1rem",
+                        fontSize: "0.9rem",
+                      }}
+                    >
+                      <div>Title : {book.title}</div>
+                      <div>Author : {book.author}</div>
+                      <div>Taken Date : {book.takenDate}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+
           </div>
           <div style={{ flex: "8", backgroundColor: "white" }}>
             <img
