@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Navigate, useNavigate } from "react-router-dom";
 // import { FaEnvelope, FaLock, FaLockOpen, FaUser } from "react-icons/fa";
 import img2 from "../../../src/pages/Assets/logins.jpg";
+import img from "./department.webp";
 
 const Signin = () => {
   const [user, setUser] = useState({});
@@ -121,7 +122,7 @@ const Signin = () => {
       </div>
       <div className="login-inner-top-right" >
         <div>
-          <img className="login-img" src={img2} alt="" srcSet="" />
+          <img className="login-img" src={img} alt="" srcSet="" />
         </div>
       </div>
     </div>

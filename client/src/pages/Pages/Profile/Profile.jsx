@@ -9,6 +9,8 @@ const Profile = ({ user }) => {
   const date = new Date(dateStr);
   const options = { day: "numeric", month: "long", year: "numeric" };
   const formattedDate = date.toLocaleDateString("en-US", options);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1028);
+
 
   const [data, setData] = useState({
     name: user.name,
@@ -26,6 +28,15 @@ const Profile = ({ user }) => {
     setData({ ...data, [e.target.name]: e.target.value });
     // setData({ ...data, uniqueId: user.uniqueId });
   };
+
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 728);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+
   const submitForm = async () => {
     // alert("Submitted")
     await axios
@@ -61,9 +72,15 @@ const Profile = ({ user }) => {
       });
   };
 
+
+
   return (
     <div style={{ paddingBlockStart: "4rem" }}>
-      <div style={{ display: "flex" }}>
+      <div style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        gap: "1rem",
+      }}>
         <div style={{ flex: "1" }}>
           <div
             style={{
@@ -290,8 +307,8 @@ const Profile = ({ user }) => {
                   name="address"
                   placeholder="Address"
                   defaultValue={user.address}
-                  
-                 onChange={(e) => handleInputs(e)}
+
+                  onChange={(e) => handleInputs(e)}
                 />
                 <span onClick={submitForm} className="profile-button">
                   Update

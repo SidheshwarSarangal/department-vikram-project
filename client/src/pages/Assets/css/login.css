@@ -1,4 +1,5 @@
  .login-top { 
+  cursor: default;
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -8,16 +9,18 @@ input {
   font-family: poppins;
 }
 .login-inner-top-left {
-  background-color: rgb(132, 185, 238);
-  flex: 3;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 107, 179, 0.7));
+  backdrop-filter: blur(6px); /* For soft blur effect behind if applicable */
+  -webkit-backdrop-filter: blur(6px); /* Safari support */
+    flex: 3;
   padding: 7rem 3rem 3rem 3rem;
 }
 .login-inner-top-right {
-  /* flex :6;
+   flex :6;
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: hidden; */
+  overflow: hidden; 
   width: 100%; /* Adjust based on your layout (50% for equal split) */
   height: 100vh; /* Full viewport height */
   display: flex; /* Ensures content alignment */
@@ -39,6 +42,8 @@ input {
   width: 92%;
   font-size: medium;
   transition: 0.2s;
+  background: white;
+  color: black;
 }
 .login-input:active,
 .login-input:focus,
@@ -49,18 +54,19 @@ input {
 .login-field {
   padding: 20px 0px;
   position: relative;
+  
 
 }
 .login-title {
   font-family: poppins;
-  color: #3d5a80;
+  color: #6a9fe6;
   font-size: 2.5rem;
 }
 .login-title-below {
   font-family: poppins;
   font-size: 3rem;
   font-weight: 600;
-  color: #3d5a80;
+  color: #6a9fe6;
 
 }
 .login-signup-call {
@@ -76,12 +82,12 @@ input {
 
 .login-img {
   width: 100%;
-  height:100vh;
+  height: 100vh;
   object-fit: cover;
+  object-position:center;
   display: block;
   border-radius: 10px;
-  
-} 
+}
 
 
 

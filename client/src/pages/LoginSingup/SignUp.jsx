@@ -213,7 +213,7 @@ const SignUp = () => {
         <div>
           <img
             className="login-img"
-            src="https://raw.githubusercontent.com/AnuragRoshan/images/a74c41aa0efd44c9239abed96d88a5ffd11ffe7f/undraw_friendship_mni7.svg"
+            src="https://images.unsplash.com/photo-1642175014539-23b986621dd4?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8aWl0JTIwcm9vcmtlZXxlbnwwfHwwfHx8MA%3D%3D"
             alt=""
             srcSet=""
           />

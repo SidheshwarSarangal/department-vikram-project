@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect } from "react";
 import "../Assets/css/landing.css";
-import img2 from "./landing.jpg";
+import img2 from "./landingpage.jpg";
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -19,7 +19,13 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="land-top" style={{ backgroundImage: `url(${img2})` }}>
+    <div className="land-top" style={{
+      backgroundImage: `url(${img2})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+    }}
+    >
       <div className="land-inner-top">
         <div className={`land-banner-image ${isLoading ? "loading" : ""}`}>
           {isLoading && (

@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Poppins:wght@300&family=Quicksand&family=Space+Grotesk&display=swap");
+@import "tailwindcss";
 
 body {
   margin: 0;

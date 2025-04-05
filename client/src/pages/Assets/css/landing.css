@@ -43,8 +43,13 @@ img.vert-move {
 
 .land-banner-slogan-inner {
   margin-inline: 1rem;
-  margin-block: 3rem;
+  padding-bottom: 4rem;
+  padding-top: 6rem;
   text-align: center;
+  background-color: rgba(0, 107, 179, 0.7); /* 70% opaque */
+  border-bottom-left-radius: 2rem;
+  border-bottom-right-radius: 2rem;
+
 }
 
 .land-logo {
@@ -65,11 +70,11 @@ img.vert-move {
   margin-block-start: 2rem;
   height: 40px;
   line-height: 40px;
-  font-size: 18px;
+  font-size: 24px;
   font-family: sans-serif;
   text-decoration: none;
-  color: #333;
-  border: 1px solid #333;
+  color: #ffffff;
+  border: 1px solid #ffffff;
   letter-spacing: 2px;
   text-align: center;
   position: relative;
@@ -91,8 +96,8 @@ img.vert-move {
   left: 0;
   width: 0;
   height: 100%;
-  background: #78d2ee;
-  transition: all 0.35s;
+  background: #00c3ff;
+  transition:  0.35s ease-in-out, color 0.35s ease-in-out;
 }
 
 .landing-button-hover:hover {
