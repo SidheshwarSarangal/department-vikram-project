@@ -60,9 +60,51 @@ const Cart = ({ user }) => {
   useEffect(() => {
     fetchData();
     fetchBorrowedBooks();
-    console.log("borrowed books", borrowedBooks)
 
   }, []); // Empty dependency array ensures it runs only once when the component mounts.
+
+
+  const handleReturn = async (book) => {
+    try {
+      const payload = {
+        uniqueId: book.uid,     // user ID from the book object
+        isbn: [book.isbn],      // send as an array of ISBNs
+      };
+      console.log("payload", payload);
+
+      const response = await axios.post('http://localhost:5000/returnBooks', payload);
+
+      if (response.status === 200) {
+        alert("Book returned successfully!");
+        window.location.reload(); // or update state instead
+      }
+    } catch (error) {
+      console.error("Error returning book:", error);
+      alert("Failed to return book.");
+    }
+  };
+
+  const handleRemoveFromCart = async (isbn) => {
+    try {
+      console.log("username",user.username);
+      console.log("isbn",isbn);
+      const response = await axios.post("http://localhost:5000/removeFromCart", {
+        username: user.username,
+        isbn: isbn, // use book.ISBN from books array
+      });
+
+      if (response.status === 200) {
+        alert("Book removed from cart successfully.");
+        window.location.reload(); // or remove from state for better UX
+      }
+    } catch (error) {
+      console.error("Error removing book from cart:", error);
+      alert("Failed to remove book.");
+    }
+  };
+
+
+
 
 
   if (data == null) {
@@ -120,52 +162,69 @@ const Cart = ({ user }) => {
                 <div>
                   <div style={{ padding: "2rem" }}>
                     <div style={{ display: "flex" }}>
-                      <div style={{ fontFamily: "poppins", fontSize: "3rem" }}>
-                        CART
-                      </div>
-                      <div className="cart-button" onClick={proceedCheckout}>
-                        Checkout
-                      </div>
+                      <div style={{ fontFamily: "poppins", fontSize: "3rem" }}>CART</div>
                     </div>
-                    {data.map((d, i) => (
+
+                    {data.map((book, i) => (
                       <div
                         key={i}
                         style={{
                           display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
                           width: "100%",
                           border: "1px solid transparent",
                           backgroundColor: "black",
-                          marginBlockEnd: "1rem",
+                          marginBottom: "1rem",
+                          color: "white",
+                          paddingRight: "1rem",
                         }}
                       >
-                        <div>
-                          <img
-                            src="https://covers.openlibrary.org/b/isbn/1933988746-L.jpg"
-                            alt=""
-                            srcSet=""
+                        <div style={{ display: "flex" }}>
+                          <div>
+                            <img
+                              src="https://covers.openlibrary.org/b/isbn/1933988746-L.jpg"
+                              alt=""
+                              style={{
+                                width: "5rem",
+                                height: "6rem",
+                                marginTop: "0rem",
+                                padding: "0.4rem 1rem",
+                              }}
+                            />
+                          </div>
+                          <div
                             style={{
-                              width: "5rem",
-                              height: "6rem",
-                              marginTop: "0rem",
+                              fontFamily: "poppins",
                               padding: "0.4rem 1rem",
+                              fontSize: "0.9rem",
                             }}
-                          />
+                          >
+                            <div>Title : {book.Title}</div>
+                            <div>Author : {book.Author}</div>
+                            <div>Publisher : {book.Publisher}</div>
+                          </div>
                         </div>
-                        <div
+
+                        <button
+                          onClick={() => handleRemoveFromCart(book.ISBN)}
                           style={{
-                            fontFamily: "poppins",
                             padding: "0.4rem 1rem",
+                            backgroundColor: "#ee6c4d",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "0.4rem",
+                            cursor: "pointer",
                             fontSize: "0.9rem",
                           }}
                         >
-                          <div>Title : {d.Title}</div>
-                          <div>Author : {d.Author}</div>
-                          <div>Publisher : {d.Publisher}</div>
-                        </div>
+                          Remove from Cart
+                        </button>
                       </div>
                     ))}
                   </div>
                 </div>
+
               </>
             )}
             <div style={{ padding: "2rem" }}>
@@ -182,38 +241,62 @@ const Cart = ({ user }) => {
                     key={index}
                     style={{
                       display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                       width: "100%",
                       border: "1px solid transparent",
                       backgroundColor: "black",
-                      marginBlockEnd: "1rem",
+                      marginBottom: "1rem",
+                      color: "white",
+                      paddingRight: "1rem"
                     }}
                   >
-                    <div>
-                      <img
-                        src="https://covers.openlibrary.org/b/isbn/1933988746-L.jpg"
-                        alt=""
+                    <div style={{ display: "flex" }}>
+                      <div>
+                        <img
+                          src="https://covers.openlibrary.org/b/isbn/1933988746-L.jpg"
+                          alt=""
+                          style={{
+                            width: "5rem",
+                            height: "6rem",
+                            marginTop: "0rem",
+                            padding: "0.4rem 1rem",
+                          }}
+                        />
+                      </div>
+                      <div
                         style={{
-                          width: "5rem",
-                          height: "6rem",
-                          marginTop: "0rem",
+                          fontFamily: "poppins",
                           padding: "0.4rem 1rem",
+                          fontSize: "0.9rem",
                         }}
-                      />
+                      >
+                        <div>Title : {book.title}</div>
+                        <div>Author : {book.author}</div>
+                        <div>Taken Date : {book.takenDate}</div>
+                      </div>
                     </div>
-                    <div
+
+                    <button
+                      onClick={() => handleReturn(book)}
                       style={{
-                        fontFamily: "poppins",
                         padding: "0.4rem 1rem",
+                        backgroundColor: "#ee6c4d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "0.4rem",
+                        cursor: "pointer",
                         fontSize: "0.9rem",
                       }}
                     >
-                      <div>Title : {book.title}</div>
-                      <div>Author : {book.author}</div>
-                      <div>Taken Date : {book.takenDate}</div>
-                    </div>
+                      Return Book
+                    </button>
                   </div>
                 ))
-              )}
+
+
+              )
+              }
             </div>
 
 

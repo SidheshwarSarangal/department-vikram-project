@@ -122,6 +122,60 @@ const BorrowList = () => {
       setCurrentPage(currentPage - 1);
     }
   };
+
+
+  const proceedCheckout = async (username) => {
+    const send = { username: username };
+    try {
+      const response = await axios.post(`http://localhost:5000/checkout`, send);
+      console.log("Checkout response:", response);
+      alert(`Checkout successful for ${username}`);
+      // Optionally refresh the cart list
+      window.location.reload();
+
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      alert("Checkout failed");
+    }
+  };
+
+  const handleReturn = async (book) => {
+    try {
+      const payload = {
+        uniqueId: book.uid,     // user ID from the book object
+        isbn: [book.isbn],      // send as an array of ISBNs
+      };
+
+      const response = await axios.post('http://localhost:5000/return', payload);
+
+      if (response.status === 200) {
+        alert("Book returned successfully!");
+        window.location.reload(); // or update state instead
+      }
+    } catch (error) {
+      console.error("Error returning book:", error);
+      alert("Failed to return book.");
+    }
+  };
+
+  const handleRemoveFromCart = async (username, isbn) => {
+    try {
+      const res = await axios.post("http://localhost:5000/removeFromCart", {
+        username,
+        isbn,
+      });
+      console.log("Removed:", res.data);
+      // Refresh the cartBooks list
+      fetchCartBooks(); // Your function to re-fetch the updated cart
+    } catch (err) {
+      console.error("Failed to remove book:", err);
+    }
+  };
+
+
+  const seenUsernames = new Set();
+
+
   return (
     <div
       style={{
@@ -134,6 +188,8 @@ const BorrowList = () => {
         padding: "0.5rem",
       }}
     >
+
+
       <div style={{ marginBottom: "2rem", paddingInlineStart: "5rem" }}>
         <h3>🛒 Check List</h3>
 
@@ -147,19 +203,63 @@ const BorrowList = () => {
                 <th style={{ width: "20rem", textAlign: "left" }}>Title</th>
                 <th style={{ width: "15rem", textAlign: "left" }}>Publisher</th>
                 <th style={{ width: "10rem", textAlign: "left" }}>Item Count</th>
+                <th style={{ width: "10rem", textAlign: "left" }}>Checkout</th>
+                <th style={{ width: "12rem", textAlign: "left" }}>Remove</th>
               </tr>
             </thead>
             <tbody>
-              {cartBooks.map((book, index) => (
-                <tr key={book._id || index}>
-                  <td>{index + 1}</td>
-                  <td>{book.userId}</td>
-                  <td>{book.Genre}</td>
-                  <td>{book.Title}</td>
-                  <td>{book.Publisher}</td>
-                  <td>{book.ItemCount}</td>
-                </tr>
-              ))}
+              {[...new Set()].forEach}; {/* Ensure seenUsernames is declared before */}
+              {(() => {
+                const seenUsernames = new Set();
+                return cartBooks.map((book, index) => {
+                  const showCheckout = !seenUsernames.has(book.username);
+                  seenUsernames.add(book.username);
+
+                  return (
+                    <tr key={book._id || index}>
+                      <td>{index + 1}</td>
+                      <td>{book.username}</td>
+                      <td>{book.Genre}</td>
+                      <td>{book.Title}</td>
+                      <td>{book.Publisher}</td>
+                      <td>{book.ItemCount}</td>
+                      <td>
+                        {showCheckout && (
+                          <button
+                            className="land-button"
+                            style={{
+                              padding: "0.4rem 1rem",
+                              backgroundColor: "#3d5a80",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "0.5rem",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => proceedCheckout(book.username)}
+                          >
+                            Checkout
+                          </button>
+                        )}
+                      </td>
+                      <td>
+                        <button
+                          style={{
+                            padding: "0.4rem 1rem",
+                            backgroundColor: "#e63946",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "0.5rem",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleRemoveFromCart(book.username, book.ISBN)}
+                        >
+                          Remove from Cart
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                });
+              })()}
             </tbody>
           </table>
         ) : (
@@ -168,6 +268,9 @@ const BorrowList = () => {
           </div>
         )}
       </div>
+
+
+
 
 
       {loading ? (
