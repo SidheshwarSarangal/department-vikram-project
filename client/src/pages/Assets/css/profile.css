@@ -7,9 +7,23 @@
   font-family: poppins;
   cursor: pointer;
   margin-left: 0.5rem;
+  color:white;
 }
 .profile-button:hover {
-  background-color: #3d5a80;
+  background-color: #000000;
   border: 1px solid transparent;
-  color: rgb(57, 28, 28);
+  color: rgb(255, 255, 255);
+}
+
+
+/* Hide number input arrows (Chrome, Safari, Edge, Opera) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide number input arrows (Firefox) */
+input[type="number"] {
+  -moz-appearance: textfield;
 }

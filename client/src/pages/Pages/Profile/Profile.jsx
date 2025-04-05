@@ -79,16 +79,18 @@ const Profile = ({ user }) => {
       <div style={{
         display: "flex",
         flexDirection: isMobile ? "column" : "row",
-        gap: "1rem",
+        marginLeft: "1rem",
+        marginRight: "1rem",
+        cursor: "default"
       }}>
         <div style={{ flex: "1" }}>
           <div
             style={{
               margin: "1rem",
-              borderRadius: "2rem 2rem 2rem 2rem",
-              backgroundColor: "#3d5a80",
+              borderRadius: "2rem",
+              background: "linear-gradient(to bottom right,rgb(0, 91, 209),rgb(66, 66, 66))", // blue to gray
               padding: "1rem",
-              boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
+              boxShadow: "1px 1px 21px -3px rgba(0,0,0,0.75)",
             }}
           >
             <div
@@ -112,10 +114,19 @@ const Profile = ({ user }) => {
                 }}
               >
                 <img
-                  style={{ width: "100%", height: "100%", marginTop: "-1px" }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    marginTop: "-1px",
+                    borderRadius: "50%",        // makes it circular
+                    border: "2px solid white",  // border styling
+                    boxSizing: "border-box",    // ensures border doesn't overflow
+                    objectFit: "cover"          // keeps the image inside the circle neatly
+                  }}
                   src={`https://api.dicebear.com/9.x/initials/svg?seed=${data.name}`}
                   alt="Avatar"
                 />
+
 
               </div>
 
@@ -192,7 +203,7 @@ const Profile = ({ user }) => {
                 color: "white",
               }}
             >
-              Nothing <span style={{ color: "#2bea2b" }}>Borrowed</span>
+              {user.borrowed.length} <a  href="/cart" style={{ color: "#2bea2b", textDecoration: "none" }}>Borrowed</a>
             </div>
             <div
               style={{
@@ -220,7 +231,7 @@ const Profile = ({ user }) => {
             <div
               style={{
                 margin: "1rem",
-                backgroundColor: "#cfe6f9",
+                background: "linear-gradient(to bottom right, #cfe6f9, #2b6cb0)", // light blue to dark blue
                 borderRadius: "2rem",
                 boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
               }}
@@ -255,7 +266,7 @@ const Profile = ({ user }) => {
                   onChange={(e) => handleInputs(e)}
                 />
               </div>
-              <div
+              {/* <div
                 style={{
                   margin: "0.5rem",
                   display: "flex",
@@ -272,8 +283,9 @@ const Profile = ({ user }) => {
                   defaultValue={user.username}
                   onChange={(e) => handleInputs(e)}
                 />
-               */}
+               }
               </div>
+                */}
               <div
                 style={{
                   margin: "0.5rem",
@@ -283,7 +295,7 @@ const Profile = ({ user }) => {
                 }}
               >
                 <input
-                  style={{ width: "30%" }}
+                  style={{ width: "60%" }}
                   type="number"
                   className="login-input"
                   name="phone"
@@ -320,7 +332,7 @@ const Profile = ({ user }) => {
               <div
                 style={{
                   margin: "1rem",
-                  backgroundColor: "#cfe6f9",
+                  background: "linear-gradient(to bottom right, #cfe6f9, #2b6cb0)", // light blue to dark blue
                   borderRadius: "2rem",
                   boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
                 }}

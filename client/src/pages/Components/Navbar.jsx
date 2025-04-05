@@ -71,7 +71,7 @@ const Navbar = ({ user }) => {
           Library
         </div>
 
-        {/* Hamburger icon only for small screens */}
+        {/* fburger icon only for small screens */}
         <div
           className="hamburger"
           onClick={() => setMenuOpen((prev) => !prev)}

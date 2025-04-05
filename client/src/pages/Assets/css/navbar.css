@@ -70,10 +70,14 @@
 
 /* Mobile styles */
 @media (max-width: 1028px) {
+  
   .hamburger {
     display: block;
-  
+    margin-top: -0.5em; /* Try adjusting this value as needed */
+    font-size: 2rem; /* optional: for better visibility */
+    cursor: pointer;
   }
+  
 
   .nav-links {
     display: none;

@@ -1,6 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import "../../Assets/css/cart.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const Cart = ({ user }) => {
   const [data, setData] = useState([null]);
@@ -67,39 +70,55 @@ const Cart = ({ user }) => {
   const handleReturn = async (book) => {
     try {
       const payload = {
-        uniqueId: book.uid,     // user ID from the book object
-        isbn: [book.isbn],      // send as an array of ISBNs
+        uniqueId: book.uid,
+        isbn: [book.isbn],
       };
       console.log("payload", payload);
 
-      const response = await axios.post('http://localhost:5000/returnBooks', payload);
+      const response = await axios.post("http://localhost:5000/returnBooks", payload);
 
       if (response.status === 200) {
-        alert("Book returned successfully!");
-        window.location.reload(); // or update state instead
+        toast.success("Book returned successfully!", {
+          position: "top-center",
+          autoClose: 2000,
+          pauseOnHover: false,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          textAlign: "center",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500); // wait 1.5 seconds before reloading
       }
     } catch (error) {
       console.error("Error returning book:", error);
-      alert("Failed to return book.");
+      toast.error("Failed to return book.");
     }
   };
 
   const handleRemoveFromCart = async (isbn) => {
     try {
-      console.log("username",user.username);
-      console.log("isbn",isbn);
       const response = await axios.post("http://localhost:5000/removeFromCart", {
         username: user.username,
-        isbn: isbn, // use book.ISBN from books array
+        isbn: isbn,
       });
 
       if (response.status === 200) {
-        alert("Book removed from cart successfully.");
-        window.location.reload(); // or remove from state for better UX
+        toast.success("Book removed from cart successfully.", {
+          position: "top-center",
+          autoClose: 2000,
+          pauseOnHover: false,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          textAlign: "center",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500); // wait 1.5 seconds before reloading
       }
     } catch (error) {
       console.error("Error removing book from cart:", error);
-      alert("Failed to remove book.");
+      toast.error("Failed to remove book.");
     }
   };
 
@@ -111,7 +130,7 @@ const Cart = ({ user }) => {
     return <>NULL H RE BABA</>;
   } else
     return (
-      <div style={{ paddingBlockStart: "4rem" }}>
+      <div style={{ paddingBlockStart: "4rem", cursor: "default" }}>
         <div style={{ display: "flex" }}>
           <div style={{ flex: "5" }}>
             {isLoading ? ( // Render loading state when isLoading is true
@@ -162,7 +181,7 @@ const Cart = ({ user }) => {
                 <div>
                   <div style={{ padding: "2rem" }}>
                     <div style={{ display: "flex" }}>
-                      <div style={{ fontFamily: "poppins", fontSize: "3rem" }}>CART</div>
+                      <div style={{ fontFamily: "poppins", fontSize: "2rem", marginBottom: "1rem" }}>CART</div>
                     </div>
 
                     {data.map((book, i) => (
@@ -209,17 +228,28 @@ const Cart = ({ user }) => {
                         <button
                           onClick={() => handleRemoveFromCart(book.ISBN)}
                           style={{
-                            padding: "0.4rem 1rem",
-                            backgroundColor: "#ee6c4d",
+                            padding: "1rem 1rem",
+                            backgroundColor: "transparent",
                             color: "white",
-                            border: "none",
+                            border: "1px solid white",
                             borderRadius: "0.4rem",
                             cursor: "pointer",
                             fontSize: "0.9rem",
+                            transition: "all 0.3s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = "white";
+                            e.target.style.color = "black";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = "transparent";
+                            e.target.style.color = "white";
                           }}
                         >
-                          Remove from Cart
+                          Remove
                         </button>
+
+
                       </div>
                     ))}
                   </div>
@@ -228,9 +258,10 @@ const Cart = ({ user }) => {
               </>
             )}
             <div style={{ padding: "2rem" }}>
-              <div style={{ fontFamily: "poppins", fontSize: "2rem", marginBottom: "1rem" }}>
-                Borrowed Books
+              <div style={{ display: "flex" }}>
+                <div style={{ fontFamily: "poppins", fontSize: "2rem", marginBottom: "1rem" }}>Borrowed Books</div>
               </div>
+
               {borrowedBooks.length === 0 ? (
                 <div style={{ fontFamily: "poppins", fontSize: "1.2rem", color: "gray" }}>
                   No books borrowed
@@ -248,18 +279,18 @@ const Cart = ({ user }) => {
                       backgroundColor: "black",
                       marginBottom: "1rem",
                       color: "white",
-                      paddingRight: "1rem"
+                      paddingRight: "1rem",
                     }}
                   >
                     <div style={{ display: "flex" }}>
                       <div>
                         <img
-                          src="https://covers.openlibrary.org/b/isbn/1933988746-L.jpg"
+                          src="https://miro.medium.com/v2/resize:fit:1200/1*d5VjR-g8k6hSXWA4n0czXQ.jpeg"
                           alt=""
                           style={{
                             width: "5rem",
                             height: "6rem",
-                            marginTop: "0rem",
+                            marginTop: "0.9rem",
                             padding: "0.4rem 1rem",
                           }}
                         />
@@ -280,24 +311,33 @@ const Cart = ({ user }) => {
                     <button
                       onClick={() => handleReturn(book)}
                       style={{
-                        padding: "0.4rem 1rem",
-                        backgroundColor: "#ee6c4d",
+                        padding: "1rem 1.4rem",
+                        backgroundColor: "transparent",
                         color: "white",
-                        border: "none",
+                        border: "1px solid white",
                         borderRadius: "0.4rem",
                         cursor: "pointer",
                         fontSize: "0.9rem",
+                        transition: "all 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = "white";
+                        e.target.style.color = "black";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = "transparent";
+                        e.target.style.color = "white";
                       }}
                     >
-                      Return Book
+                      Return
                     </button>
+
+
                   </div>
                 ))
-
-
-              )
-              }
+              )}
             </div>
+
 
 
           </div>
