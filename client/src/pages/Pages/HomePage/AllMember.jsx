@@ -106,9 +106,20 @@ const AllMember = ({ user }) => {
               justifyContent: "center",
               paddingInline: "1rem",
               marginBlockStart: "1rem",
+              borderRadius: "1.5rem",
+              margin: "0 0rem", // Center it horizontally
+
+
             }}
           >
-            <table className="table">
+            <table className="table" style={{
+              borderRadius: "1.5rem",
+              overflow: "hidden",           // ✅ Ensures the radius clips children
+              borderCollapse: "separate",   // ✅ Required for radius to work
+              borderSpacing: 0,             // Optional: removes gaps
+              width: "80%",
+              marginLeft: "2rem"
+            }}>
               <thead style={{ backgroundColor: "#3d5a80", color: "white" }}>
                 <th style={{ width: "5rem", textAlign: "left" }}>#</th>
                 <th style={{ width: "15rem", textAlign: "left" }}>Name</th>
@@ -149,7 +160,8 @@ const AllMember = ({ user }) => {
               marginBlockStart: "2rem",
               display: "flex",
               flexDirection: "row",
-              justifyContent: "center",
+              justifyContent: "left",
+              margin: "2rem 2rem", // Center it horizontally
             }}
           >
             <div

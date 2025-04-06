@@ -1,0 +1,74 @@
+.lists-responsive-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    margin: 2rem auto;
+    margin-left: 1rem;
+    gap:2rem;
+    max-width:  90%;
+    box-sizing: border-box;
+    
+  }
+  
+  .lists-left {
+    box-sizing: border-box;
+    width: 70%;
+  }
+  
+  .lists-right {
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    scale: 1.5;
+    width: 40%;
+    margin-top: 20rem;
+  }
+  
+  /* Stack on smaller screens */
+  @media screen and (max-width: 1400px) {
+    .lists-responsive-container {
+      flex-direction: column;
+      margin-left: -5rem;
+      width:100%;
+      margin-right: -10rem;
+
+    }
+    .lists-left{
+        width: 100%;
+
+    }
+  
+    .lists-left,
+    .lists-right {
+        
+      
+    }
+  
+    .lists-right {
+      margin-top: 2rem;
+      width: 100%;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    .lists-responsive-container {
+      flex-direction: column;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      gap: 0;
+    }
+  
+    .lists-left,
+    .lists-right {
+      width: 100%;
+      margin-left: -4rem;
+        margin-right: -10rem;
+      scale: 1;
+    }
+  
+    .lists-right {
+      margin-top: 1rem;
+    }
+  }

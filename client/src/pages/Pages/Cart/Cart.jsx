@@ -290,7 +290,8 @@ const Cart = ({ user }) => {
                           style={{
                             width: "5rem",
                             height: "6rem",
-                            marginTop: "0.9rem",
+                            marginTop: "0.5rem",
+                            marginBottom: "0.5rem",
                             padding: "0.4rem 1rem",
                           }}
                         />
@@ -300,6 +301,9 @@ const Cart = ({ user }) => {
                           fontFamily: "poppins",
                           padding: "0.4rem 1rem",
                           fontSize: "0.9rem",
+                          marginBottom: "0.5rem",
+                          marginTop: "0.5rem",
+
                         }}
                       >
                         <div>Title : {book.title}</div>

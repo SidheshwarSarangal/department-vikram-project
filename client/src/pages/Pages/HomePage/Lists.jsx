@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "../../Assets/css/table.css"
+import "../../Assets/css/lists.css"
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Lists = ({ user }) => {
   const [data, setData] = useState([]);
@@ -37,16 +41,33 @@ const Lists = ({ user }) => {
   const addToCart = async () => {
     const books = selectedBooks;
     const username = user.username;
-    const send = { books: books, username: username };
+    const send = { books, username };
     const { result, message } = await addToCartCaller(send);
-    if (result) {
-      window.location.href = "/Cart";
-    } else {
-      alert(message); // Will now show: "Book with ISBN 9780743273565 is out of stock"
-    }
 
+    if (result) {
+      toast.success("Books added to cart successfully!", {
+        position: "top-center",
+        autoClose: 2000,
+        pauseOnHover: false,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        style: { textAlign: "center" },
+      });
+
+      setTimeout(() => {
+        window.location.href = "/Cart";
+      }, 2000);
+    } else {
+      toast.error(message || "Failed to add books to cart", {
+        position: "top-center",
+        autoClose: 2000,
+        pauseOnHover: false,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        style: { textAlign: "center" },
+      });
+    }
   };
-  // console.log(selectedBooks);
 
   const fetchData = async () => {
     let search = filter.search;
@@ -69,12 +90,6 @@ const Lists = ({ user }) => {
       setData([]); // Ensure data does not remain undefined
     }
   };
-
-
-
-
-
-
   /*const fetchData = async () => {
     // setInterval(async () => {
     let search = filter.search;
@@ -153,11 +168,133 @@ const Lists = ({ user }) => {
         margin: "1rem",
         borderRadius: "1.5rem",
         padding: "0.5rem",
+        cursor: "default"
       }}
     >
       {data.length > 0 ? (
-        <>
-          <div>
+        <div className="lists-responsive-container">
+
+
+          <div className="lists-left">
+            <div className="login-field ">
+              <input
+                type="text"
+                className="login-input"
+                placeholder="Search Books"
+                name="search"
+                style={{ width: "40%", marginInlineStart: "5rem" }}
+                onChange={(e) => handleInputs(e)}
+              />
+            </div>
+            <div
+              style={{
+                justifyContent: "center",
+                paddingInlineStart: "5rem",
+                width: "100%",
+              }}
+            >
+              <div className="table-container">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: "5rem" }}>#</th>
+                      <th style={{ width: "15rem" }}>Name</th>
+                      <th style={{ width: "15rem" }}>Publisher</th>
+                      <th style={{ width: "15rem" }}>Genre</th>
+                      <th style={{ width: "10rem" }}>Add To Cart</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {record.map((d, i) => (
+                      <tr key={d.ISBN || `book-${i}`}>
+                        <td>{(currentPage - 1) * 10 + i + 1}</td>
+                        <td
+                          className="clickable"
+                          onClick={() => handleBookClick(d.Title)}
+                        >
+                          {d.Title || "N/A"}
+                        </td>
+                        <td>{d.Author || "Unknown Author"}</td>
+                        <td>{d.Genre || "Uncategorized"}</td>
+                        <td>
+                          <input
+                            type="checkbox"
+                            onChange={(e) => handleCheckboxChange(e, d.ISBN)}
+                            checked={selectedBooks.includes(d.ISBN)}
+                            disabled={!d.ISBN}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+            <div
+              style={{
+                textAlign: "left",
+                marginBlockStart: "2rem",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                marginLeft: "5rem"
+              }}
+            >
+              <div
+                className="land-button lists-button"
+                style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
+                onClick={prevPage}
+              >
+                <a
+                  className="landing-button-hover"
+                  style={{ width: "5rem", margin: "10px" }}
+                >
+                  <span>PREV</span>
+                </a>
+              </div>
+
+              <div style={{ paddingBlockStart: "1rem" }}>{currentPage}</div>
+              <div
+                className="land-button"
+                style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
+                onClick={nextPage}
+              >
+                <a
+                  className="landing-button-hover"
+                  style={{ width: "5rem", margin: "10px" }}
+                >
+                  <span>NEXT</span>
+                </a>
+              </div>
+            </div>
+            <div
+              style={{
+                marginLeft: "-1.6rem",
+                // marginBlockEnd: "2rem",
+              }}
+            >
+              <div
+                className="land-button"
+                style={{ cursor: "pointer" }}
+                onClick={addToCart}
+              >
+                <a
+                  className="landing-button-hover"
+                  style={{
+                    width: "22rem",
+                  }}
+                >
+                  <span>PROCCED TO CHECKOUT</span>
+                </a>
+              </div>
+              <div style={{ marginLeft: "8rem", marginTop: "1rem" }}>
+                Save Selected Item To Cart And Proceed To Checkout
+              </div>
+            </div>
+
+          </div>
+          <div className="lists-right">
             <img
               className="vert-move"
               style={{
@@ -171,126 +308,7 @@ const Lists = ({ user }) => {
               srcSet=""
             />
           </div>
-          <div className="login-field ">
-            <input
-              type="text"
-              className="login-input"
-              placeholder="Search Books"
-              name="search"
-              style={{ width: "40%", marginInlineStart: "5rem" }}
-              onChange={(e) => handleInputs(e)}
-            />
-          </div>
-          <div
-            style={{
-              justifyContent: "center",
-              paddingInlineStart: "5rem",
-              width: "100%",
-            }}
-          >
-            <table className="table">
-              <thead style={{ backgroundColor: "#3d5a80", color: "white" }}>
-                <tr>
-                  <th style={{ width: "5rem", textAlign: "left" }}>#</th>
-                  <th style={{ width: "15rem", textAlign: "left" }}>Name</th>
-                  <th style={{ width: "15rem", textAlign: "left" }}>Publisher</th>
-                  <th style={{ width: "15rem", textAlign: "left" }}>Genre</th>
-                  <th style={{ width: "15rem", textAlign: "left" }}>Add To Cart</th>
-                </tr>
-              </thead>
-
-
-              <tbody>
-                {record.map((d, i) => (
-                  <tr key={d.ISBN || `book-${i}`}>
-                    <td>{(currentPage - 1) * 10 + i + 1}</td>
-                    <td
-                      style={{ cursor: "pointer", padding: "0.5rem" }}
-                      onClick={() => handleBookClick(d.Title)}
-                    >
-                      {d.Title || "N/A"}
-                    </td>
-                    <td style={{ padding: "0.5rem" }}>{d.Author || "Unknown Author"}</td>
-                    <td style={{ padding: "0.5rem" }}>{d.Genre || "Uncategorized"}</td>
-                    <td style={{ padding: "0.5rem" }}>
-                      {/* Prevent selecting books without an ISBN */}
-                      {/* Prevent selecting books without an ISBN */}
-                      <input
-                        type="checkbox"
-                        onChange={(e) => handleCheckboxChange(e, d.ISBN)}
-                        checked={selectedBooks.includes(d.ISBN)}
-                        disabled={!d.ISBN}
-                      />
-
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-
-
-            </table>
-          </div>
-          <div
-            style={{
-              textAlign: "center",
-              marginBlockStart: "2rem",
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              className="land-button lists-button"
-              style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
-              onClick={prevPage}
-            >
-              <a
-                className="landing-button-hover"
-                style={{ width: "5rem", margin: "10px" }}
-              >
-                <span>PREV</span>
-              </a>
-            </div>
-
-            <div style={{ paddingBlockStart: "1rem" }}>{currentPage}</div>
-            <div
-              className="land-button"
-              style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
-              onClick={nextPage}
-            >
-              <a
-                className="landing-button-hover"
-                style={{ width: "5rem", margin: "10px" }}
-              >
-                <span>NEXT</span>
-              </a>
-            </div>
-          </div>
-          <div
-            style={{
-              marginLeft: "45rem",
-              // marginBlockEnd: "2rem",
-            }}
-          >
-            <div
-              className="land-button"
-              style={{ cursor: "pointer" }}
-              onClick={addToCart}
-            >
-              <a
-                className="landing-button-hover"
-                style={{
-                  width: "20rem",
-                }}
-              >
-                <span>PROCCED TO CHECKOUT</span>
-              </a>
-            </div>
-            <div style={{ marginLeft: "1.5rem" }}>
-              Save Selected Item To Cart And Proceed To Checkout
-            </div>
-          </div>
-        </>
+        </div>
       ) : (
         <div className="loaders book">
 

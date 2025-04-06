@@ -1,79 +1,42 @@
 import React from "react";
+import "../../Assets/css/DummyData.css"; // include the CSS file below
+
+const stats = [
+  {
+    title: "42",
+    label: "Borrowed",
+    img: "https://raw.githubusercontent.com/AnuragRoshan/images/8d4745ca737a0e4a2307509f7d5ebbb994cf7158/undraw_sharing_knowledge_03vp.svg",
+  },
+  {
+    title: "16",
+    label: "Overdues",
+    img: "https://raw.githubusercontent.com/AnuragRoshan/images/8d4745ca737a0e4a2307509f7d5ebbb994cf7158/undraw_receipt_re_fre3.svg",
+  },
+  {
+    title: "148",
+    label: "New Members",
+    img: "https://raw.githubusercontent.com/AnuragRoshan/images/8d4745ca737a0e4a2307509f7d5ebbb994cf7158/undraw_new_entries_re_cffr.svg",
+  },
+  {
+    title: "542",
+    label: "Visitors",
+    img: "https://raw.githubusercontent.com/AnuragRoshan/images/8d4745ca737a0e4a2307509f7d5ebbb994cf7158/undraw_real_time_analytics_re_yliv.svg",
+  },
+];
 
 const DummyData = () => {
   return (
-    <div
-      style={{
-        margin: "1rem",
-        backgroundColor: "#3d5a80",
-        height: "10rem",
-        borderRadius: "2rem",
-        display: "flex",
-        flexDirection: "row",
-        padding: "1rem",
-      }}
-    >
-      <div className="dummy-inner-box" style={{}}>
-        <div>
-          <img
-            style={{ width: "8rem" }}
-            src="https://raw.githubusercontent.com/AnuragRoshan/images/8d4745ca737a0e4a2307509f7d5ebbb994cf7158/undraw_sharing_knowledge_03vp.svg"
-            alt=""
-            srcSet=""
-          />
+    <div className="dummy-container">
+      {stats.map((item, index) => (
+        <div
+          key={index}
+          className={`card-box ${index >= 2 ? "small-card" : ""}`}
+        >
+          <img src={item.img} alt={item.label} className="card-img" />
+          <div className="card-title">{item.title}</div>
+          <div className="card-label">{item.label}</div>
         </div>
-        <div style={{ padding: "1rem", width: "100%", textAlign: "center" }}>
-          <div style={{ fontSize: "4rem", fontWeight: "bolder" }}>42 </div>
-          <div>Borrowed</div>
-        </div>
-      </div>
-      <div className="dummy-inner-box" style={{}}>
-        <div>
-          <img
-            style={{ width: "8rem" }}
-            src="https://raw.githubusercontent.com/AnuragRoshan/images/8d4745ca737a0e4a2307509f7d5ebbb994cf7158/undraw_receipt_re_fre3.svg"
-            alt=""
-            srcSet=""
-          />
-        </div>
-        <div style={{ padding: "1rem", width: "100%", textAlign: "center" }}>
-          <div style={{ fontSize: "4rem", fontWeight: "bolder" }}>16 </div>
-          <div>Overdues</div>
-        </div>
-      </div>
-      <div className="dummy-inner-box" style={{}}>
-        <div>
-          <img
-            style={{ width: "8rem" }}
-            src="https://raw.githubusercontent.com/AnuragRoshan/images/8d4745ca737a0e4a2307509f7d5ebbb994cf7158/undraw_new_entries_re_cffr.svg"
-            alt=""
-            srcSet=""
-          />
-        </div>
-        <div style={{ padding: "1rem", width: "100%", textAlign: "center" }}>
-          <div style={{ fontSize: "4rem", fontWeight: "bolder" }}>148 </div>
-          <div>New Members</div>
-        </div>
-      </div>
-      <div
-        className="dummy-inner-box"
-        style={{
-          marginRight: "0",
-        }}
-      >
-        <div>
-          <img
-            style={{ width: "8rem" }}
-            src="https://raw.githubusercontent.com/AnuragRoshan/images/8d4745ca737a0e4a2307509f7d5ebbb994cf7158/undraw_real_time_analytics_re_yliv.svg"
-            alt=""
-            srcSet=""
-          />
-        </div>
-        <div style={{ padding: "1rem", width: "100%", textAlign: "center" }}>
-          <div style={{ fontSize: "4rem", fontWeight: "bolder" }}>542 </div>
-          <div>Visitors</div>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };
