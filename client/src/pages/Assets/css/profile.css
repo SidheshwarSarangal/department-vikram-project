@@ -1,5 +1,4 @@
 .profile-button {
-  /* paddingBlock: "0.5rem", paddingInline: "1rem"  */
   padding-block: 0.5rem;
   padding-inline: 1rem;
   border: 1px solid black;
@@ -7,8 +6,12 @@
   font-family: poppins;
   cursor: pointer;
   margin-left: 0.5rem;
-  color:white;
+  color: white;
+  background-color: transparent; /* <-- ADD THIS */
+  justify-content: left;
 }
+
+
 .profile-button:hover {
   background-color: #000000;
   border: 1px solid transparent;

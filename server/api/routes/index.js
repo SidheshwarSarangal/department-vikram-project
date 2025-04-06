@@ -3,6 +3,7 @@ const router = require("express").Router();
 
 const userController = require("../controller/userAPI");
 const bookController = require("../controller/bookAPI");
+const feedbackController = require("../controller/feedbackAPI");
 
 
 // user api
@@ -28,7 +29,12 @@ router.get("/booksInCart/:username", bookController.booksInCart);
 router.get("/borrowedBooks", bookController.borrowedBooks);
 router.get("/allBooksInCart", bookController.allBooksInCart);
 
-
-
+//feedback
+router.post("/addFeedback", feedbackController.addFeedback);
+router.delete("/deleteFeedback/:id", feedbackController.removeFeedback);
+router.put('/feedbackAccept/:id/', feedbackController.setStatusAcceptedAndClose);
+router.put('/feedbackReject/:id/', feedbackController.setStatusRejectedAndClose);
+router.get('/getAllFeedbacks', feedbackController.viewAllQuery);
+router.get('/getUserFeedbacks/:username', feedbackController.viewUserQuery);
 
 module.exports = router;

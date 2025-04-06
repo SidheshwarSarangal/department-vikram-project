@@ -3,6 +3,8 @@ import "../../Assets/css/profile.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import FeedbackTable from "./FeedbackTable";
+
 
 const Profile = ({ user }) => {
   const dateStr = user.createdAt;
@@ -10,6 +12,44 @@ const Profile = ({ user }) => {
   const options = { day: "numeric", month: "long", year: "numeric" };
   const formattedDate = date.toLocaleDateString("en-US", options);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1028);
+
+  const [feedback, setFeedback] = useState('I like to suggest You .....');
+  const [status, setStatus] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('');
+
+    try {
+      console.log(user.username);
+      console.log(user.phone);
+      console.log(feedback);
+      
+      const response = await fetch('http://localhost:5000/addFeedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: user.username,
+          phone: user.phone,
+          feedback: feedback,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setStatus('Feedback submitted successfully!');
+        setFeedback('');
+      } else {
+        setStatus(data.message || 'Something went wrong.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setStatus('Server error. Try again later.');
+    }
+  };
+
 
 
   const [data, setData] = useState({
@@ -203,7 +243,7 @@ const Profile = ({ user }) => {
                 color: "white",
               }}
             >
-              {user.borrowed.length} <a  href="/cart" style={{ color: "#2bea2b", textDecoration: "none" }}>Borrowed</a>
+              {user.borrowed.length} <a href="/cart" style={{ color: "#2bea2b", textDecoration: "none" }}>Borrowed</a>
             </div>
             <div
               style={{
@@ -329,46 +369,62 @@ const Profile = ({ user }) => {
               </div>
             </div>
             <div>
-              <div
-                style={{
-                  margin: "1rem",
-                  background: "linear-gradient(to bottom right, #cfe6f9, #2b6cb0)", // light blue to dark blue
-                  borderRadius: "2rem",
-                  boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
-                }}
-              >
+              <form onSubmit={handleSubmit}>
                 <div
                   style={{
-                    color: "#539cda",
-                    margin: "0.5rem",
-                    display: "flex",
-                    padding: "1rem 0 0 1rem",
-                    fontSize: "2rem",
-                    fontWeight: "600",
-                    fontFamily: "poppins",
+                    margin: '1rem',
+                    background: 'linear-gradient(to bottom right, #cfe6f9, #2b6cb0)',
+                    borderRadius: '2rem',
+                    boxShadow: '1px 1px 21px -3px rgba(0,0,0,0.75)',
                   }}
                 >
-                  Any Query Or Feedbak ?
+                  <div
+                    style={{
+                      color: '#539cda',
+                      margin: '0.5rem',
+                      display: 'flex',
+                      padding: '1rem 0 0 1rem',
+                      fontSize: '2rem',
+                      fontWeight: '600',
+                      fontFamily: 'poppins',
+                    }}
+                  >
+                    Any Query Or Feedback?
+                  </div>
+
+                  <div style={{ margin: '0.5rem', padding: '0.5rem' }}>
+                    <textarea
+                      name="feedback"
+                      placeholder="Write something..."
+                      rows={6}
+                      value={feedback}
+                      onChange={(e) => setFeedback(e.target.value)}
+                      style={{ width: '100%', fontFamily: 'poppins' }}
+                      required
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 1rem 1rem' }}>
+                    <button
+                      type="submit"
+                      className="profile-button"
+                      style={{
+                      }}
+                    >
+                      Submit
+                    </button>
+                  </div>
                 </div>
-                <div
-                  style={{
-                    margin: "0.5rem",
-                    display: "flex",
-                    padding: "0.5rem",
-                  }}
-                >
-                  <textarea
-                    style={{ width: "100%", fontFamily: "poppins" }}
-                    type="text"
-                    className="login-input"
-                    name="query"
-                    placeholder="Write Something ..."
-                    defaultValue="I like to suggest You ....."
-                    rows={6}
-                  />
+              </form>
+
+              {status && (
+                <div style={{ margin: '1rem', color: '#2b6cb0', fontFamily: 'poppins' }}>
+                  {status}
                 </div>
-              </div>
+              )}
             </div>
+            <FeedbackTable user={user} />
+
           </div>
         </div>
       </div>
