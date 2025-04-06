@@ -95,7 +95,7 @@ const Navbar = ({ user }) => {
             }`}
             onClick={handleCart}
           >
-            {user.userType === "user" ? "Cart" : "Borrower"}
+            {user.userType === "user" ? "Cart" : "Check-Borrow"}
           </div>
           <div
             className={`linked ${

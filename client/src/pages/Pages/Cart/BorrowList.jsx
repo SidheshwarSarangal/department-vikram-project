@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../../Assets/css/adminBorrow.css"
 
 const BorrowList = () => {
   const [data, setData] = useState([]);
@@ -17,8 +18,12 @@ const BorrowList = () => {
     try {
       const response = await axios.get("http://localhost:5000/allBooksInCart");
       console.log(response.data.books);
+
       if (Array.isArray(response.data.books)) {
-        setCartBooks(response.data.books);
+        const sortedBooks = response.data.books.sort((a, b) =>
+          a.username.localeCompare(b.username)
+        );
+        setCartBooks(sortedBooks);
       } else {
         setCartBooks([]);
       }
@@ -27,6 +32,7 @@ const BorrowList = () => {
       setCartBooks([]);
     }
   };
+
 
 
   const addToCart = async () => {
@@ -175,6 +181,9 @@ const BorrowList = () => {
 
   const seenUsernames = new Set();
 
+  const isMobile = window.innerWidth <= 768;
+
+
 
   return (
     <div
@@ -188,85 +197,39 @@ const BorrowList = () => {
         padding: "0.5rem",
       }}
     >
-
-
-      <div style={{ marginBottom: "2rem", paddingInlineStart: "5rem" }}>
-        <h3>🛒 Check List</h3>
-
-        {cartBooks.length > 0 ? (
-          <table className="table">
-            <thead style={{ backgroundColor: "#ee6c4d", color: "white" }}>
-              <tr>
-                <th style={{ width: "5rem", textAlign: "left" }}>#</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>User ID</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Genre</th>
-                <th style={{ width: "20rem", textAlign: "left" }}>Title</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Publisher</th>
-                <th style={{ width: "10rem", textAlign: "left" }}>Item Count</th>
-                <th style={{ width: "10rem", textAlign: "left" }}>Checkout</th>
-                <th style={{ width: "12rem", textAlign: "left" }}>Remove</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...new Set()].forEach}; {/* Ensure seenUsernames is declared before */}
-              {(() => {
-                const seenUsernames = new Set();
-                return cartBooks.map((book, index) => {
-                  const showCheckout = !seenUsernames.has(book.username);
-                  seenUsernames.add(book.username);
-
-                  return (
-                    <tr key={book._id || index}>
-                      <td>{index + 1}</td>
-                      <td>{book.username}</td>
-                      <td>{book.Genre}</td>
-                      <td>{book.Title}</td>
-                      <td>{book.Publisher}</td>
-                      <td>{book.ItemCount}</td>
-                      <td>
-                        {showCheckout && (
-                          <button
-                            className="land-button"
-                            style={{
-                              padding: "0.4rem 1rem",
-                              backgroundColor: "#3d5a80",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "0.5rem",
-                              cursor: "pointer",
-                            }}
-                            onClick={() => proceedCheckout(book.username)}
-                          >
-                            Checkout
-                          </button>
-                        )}
-                      </td>
-                      <td>
-                        <button
-                          style={{
-                            padding: "0.4rem 1rem",
-                            backgroundColor: "#e63946",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "0.5rem",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => handleRemoveFromCart(book.username, book.ISBN)}
-                        >
-                          Remove from Cart
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                });
-              })()}
-            </tbody>
-          </table>
-        ) : (
-          <div style={{ textAlign: "center", fontSize: "1.2rem", padding: "1rem" }}>
-            📭 No books to check out
-          </div>
-        )}
+      <div style={{ position: "relative", height: "3rem", marginBottom: "2rem" }}>
+        <button
+          onClick={() => {
+            document.getElementById("checklist")?.scrollIntoView({ behavior: "smooth" });
+          }}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            right: "3rem",
+            backgroundColor: "transparent",
+            border: "1px solid white",
+            borderRadius: "1rem",
+            padding: "0.5rem 1rem",
+            cursor: "pointer",
+            fontSize: "1rem",
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            transition: "all 0.3s ease"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "white";
+            e.currentTarget.style.color = "black";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.color = "white";
+          }}
+          aria-label="Scroll to checklist"
+        >
+          <span>Checklist</span> <span style={{ fontSize: "1.3rem" }}>👇</span>
+        </button>
       </div>
 
 
@@ -284,101 +247,246 @@ const BorrowList = () => {
           📚 Nothing in Checklist
         </div>
       ) : (
-        <>
+        <div className="lists-responsive-container">
+
+
+
+          <div className="admin-table-borrow">
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Borrower</th>
+                    <th>Book Name</th>
+                    <th>Author</th>
+                    <th>Due/Borrowed Date</th>
+                    {/* <th>Returned</th> */}
+                  </tr>
+                </thead>
+                <tbody>
+                  {record.map((d, i) => (
+                    <tr key={d.isbn || i}>
+                      <td>{(currentPage - 1) * 10 + i + 1}</td>
+                      <td>{d.borrower}</td>
+                      <td>{d.title}</td>
+                      <td>{d.author}</td>
+                      <td>{formatDate(d.takenDate)}</td>
+                      {/*<td>
+                      <input
+                      type="checkbox"
+                      onChange={(e) => handleCheckboxChange(e, d.isbn)}
+                      checked={selectedBooks.includes(d.isbn)}
+                      />
+                      </td>*/}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+
+            <div
+              style={{
+                textAlign: "center",
+                marginBlockStart: "2rem",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "left",
+              }}
+            >
+              <div
+                className="land-button lists-button"
+                style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
+                onClick={prevPage}
+              >
+                <a
+                  className="landing-button-hover"
+                  style={{ width: "5rem", margin: "10px" }}
+                >
+                  <span>PREV</span>
+                </a>
+              </div>
+
+              <div style={{ paddingBlockStart: "1rem" }}>{currentPage}</div>
+
+              <div
+                className="land-button"
+                style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
+                onClick={nextPage}
+              >
+                <a
+                  className="landing-button-hover"
+                  style={{ width: "5rem", margin: "10px" }}
+                >
+                  <span>NEXT</span>
+                </a>
+              </div>
+            </div>
+
+            {/*<div style={{ marginLeft: "45rem" }}>
+              <div className="land-button" style={{ cursor: "pointer" }} onClick={addToCart}>
+                <a className="landing-button-hover" style={{ width: "12rem" }}>
+                  <span>SAVE CHANGE</span>
+                </a>
+              </div>
+              <div style={{ marginLeft: "8.4rem" }}>
+                Save Returned Status of Borrower
+              </div>
+            </div>*/}
+          </div>
+
           <div>
             <img
               className="vert-move"
-              style={{ width: "40%", marginLeft: "30%" }}
+              style={{ width: "70%", marginLeft: "30%" }}
               src="https://raw.githubusercontent.com/AnuragRoshan/images/71611a64e2b0acde9f0527b4f2341fabd7bf9555/undraw_process_re_gws7.svg"
               alt=""
             />
           </div>
+        </div>
+      )}
 
-          <div style={{ justifyContent: "center", paddingInlineStart: "5rem" }}>
-            <table className="table">
-              <thead style={{ backgroundColor: "#3d5a80", color: "white" }}>
+      <div id="checklist" className="admin-section-padding">
+
+        <h1
+          style={{
+            fontSize: "2rem",
+            fontWeight: "600",
+            color: "white",
+            marginBottom: "1rem",
+            marginTop: "1rem",
+          }}
+        >
+          🛒 Check List
+        </h1>
+        <div
+          style={{
+            backgroundColor: "#fff4e5",
+            color: "#663c00",
+            width: "50%",
+            border: "1px solid #ffcc80",
+            borderRadius: "0.75rem",
+            padding: "1rem 1.5rem",
+            marginTop: "1rem",
+            marginLeft: "4rem",
+            fontWeight: "500",
+            textAlign: "left",
+            fontFamily: "Segoe UI, Tahoma, Geneva, Verdana, sans-serif",
+            color: "red"
+          }}
+        >
+          First REMOVE the books which cannot be checked out and then do the CHECKOUT for that user.
+        </div>
+
+        {cartBooks.length > 0 ? (
+          <div
+            style={{
+              overflowX: "auto",
+              borderRadius: "1rem",
+              boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+              marginTop: "2rem",
+              width: "90%",
+            }}
+          >
+            <table
+              className="table"
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                minWidth: "700px",
+                fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              <thead
+                style={{
+                  backgroundColor: "#ee6c4d",
+                  color: "white",
+                }}
+              >
                 <tr>
-                  <th style={{ width: "5rem", textAlign: "left" }}>#</th>
-                  <th style={{ width: "15rem", textAlign: "left" }}>Borrower</th>
-                  <th style={{ width: "15rem", textAlign: "left" }}>Book Name</th>
-                  <th style={{ width: "15rem", textAlign: "left" }}>Author</th>
-                  <th style={{ width: "15rem", textAlign: "left" }}>
-                    Due/Borrowed Date
-                  </th>
-                  <th style={{ width: "15rem", textAlign: "left" }}>Returned</th>
+                  <th style={{ padding: "1rem", textAlign: "left", width: "5rem" }}>#</th>
+                  <th style={{ padding: "1rem", textAlign: "left", width: "15rem" }}>User ID</th>
+                  <th style={{ padding: "1rem", textAlign: "left", width: "15rem" }}>Genre</th>
+                  <th style={{ padding: "1rem", textAlign: "left", width: "20rem" }}>Title</th>
+                  <th style={{ padding: "1rem", textAlign: "left", width: "15rem" }}>Publisher</th>
+                 {/* <th style={{ padding: "1rem", textAlign: "left", width: "10rem" }}>Item Count</th>*/}
+                  <th style={{ padding: "1rem", textAlign: "left", width: "10rem" }}>Checkout</th>
+                  <th style={{ padding: "1rem", textAlign: "left", width: "12rem" }}>Remove</th>
                 </tr>
               </thead>
               <tbody>
-                {record.map((d, i) => (
-                  <tr key={d.isbn || i}>
-                    <td>{(currentPage - 1) * 10 + i + 1}</td>
-                    <td style={{ padding: "0.5rem" }}>{d.borrower}</td>
-                    <td style={{ padding: "0.5rem" }}>{d.title}</td>
-                    <td style={{ padding: "0.5rem" }}>{d.author}</td>
-                    <td style={{ padding: "0.5rem" }}>{formatDate(d.takenDate)}</td>
-                    <td style={{ padding: "0.5rem" }}>
-                      <input
-                        type="checkbox"
-                        onChange={(e) => handleCheckboxChange(e, d.isbn)}
-                        checked={selectedBooks.includes(d.isbn)}
-                      />
-                    </td>
-                  </tr>
-                ))}
+                {(() => {
+                  const seenUsernames = new Set();
+                  return cartBooks.map((book, index) => {
+                    const showCheckout = !seenUsernames.has(book.username);
+                    seenUsernames.add(book.username);
+
+                    return (
+                      <tr
+                        key={book._id || index}
+                        style={{
+                          backgroundColor: "white",
+                          transition: "background 0.2s ease",
+                          cursor: "default",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#e0efff")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
+                      >
+                        <td style={{ padding: "1rem", color: "#333", fontSize: "0.95rem" }}>{index + 1}</td>
+                        <td style={{ padding: "1rem", color: "#333" }}>{book.username}</td>
+                        <td style={{ padding: "1rem", color: "#333" }}>{book.Genre}</td>
+                        <td style={{ padding: "1rem", color: "#333" }}>{book.Title}</td>
+                        <td style={{ padding: "1rem", color: "#333" }}>{book.Publisher}</td>
+                       {/* <td style={{ padding: "1rem", color: "#333" }}>{book.ItemCount}</td> */}
+                        <td style={{ padding: "1rem" }}>
+                          {showCheckout && (
+                            <button
+                              style={{
+                                padding: "0.4rem 1rem",
+                                backgroundColor: "#3d5a80",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "0.5rem",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => proceedCheckout(book.username)}
+                            >
+                              Checkout
+                            </button>
+                          )}
+                        </td>
+                        <td style={{ padding: "1rem" }}>
+                          <button
+                            style={{
+                              padding: "0.4rem 1rem",
+                              backgroundColor: "#e63946",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "0.5rem",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => handleRemoveFromCart(book.username, book.ISBN)}
+                          >
+                            Remove from Cart
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  });
+                })()}
               </tbody>
             </table>
           </div>
+        ) : (
+          <p>No books in cart.</p>
+        )}
 
-          <div
-            style={{
-              textAlign: "center",
-              marginBlockStart: "2rem",
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              className="land-button lists-button"
-              style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
-              onClick={prevPage}
-            >
-              <a
-                className="landing-button-hover"
-                style={{ width: "5rem", margin: "10px" }}
-              >
-                <span>PREV</span>
-              </a>
-            </div>
+      </div>
 
-            <div style={{ paddingBlockStart: "1rem" }}>{currentPage}</div>
 
-            <div
-              className="land-button"
-              style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
-              onClick={nextPage}
-            >
-              <a
-                className="landing-button-hover"
-                style={{ width: "5rem", margin: "10px" }}
-              >
-                <span>NEXT</span>
-              </a>
-            </div>
-          </div>
 
-          <div style={{ marginLeft: "45rem" }}>
-            <div className="land-button" style={{ cursor: "pointer" }} onClick={addToCart}>
-              <a className="landing-button-hover" style={{ width: "12rem" }}>
-                <span>SAVE CHANGE</span>
-              </a>
-            </div>
-            <div style={{ marginLeft: "8.4rem" }}>
-              Save Returned Status of Borrower
-            </div>
-          </div>
-        </>
-      )}
+
     </div>
   );
 

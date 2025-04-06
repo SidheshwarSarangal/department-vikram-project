@@ -1,0 +1,69 @@
+.admin-checklist {
+    overflow-x: auto;
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+    width: 90%;
+    transition: width 0.3s ease;
+  }
+
+.admin-table-borrow{
+    width: 100%;
+    margin-inline: auto;
+
+}
+@media (min-width: 500px) and (max-width: 1200px) {
+    .admin-table-borrow {
+      margin-left: 10rem;
+    }
+  }
+@media (max-width: 1028px) {
+    .admin-table-borrow {
+      margin-inline: auto;
+    }
+  }
+  
+  /* Full width on smaller screens */
+  @media (max-width: 768px) {
+    .admin-checklist {
+      width: 100%;
+    }
+
+    .admin-table-borrow {
+        margin-inline: auto;
+      }
+  }
+
+  
+  .admin-section-padding {
+    margin-bottom: 2rem;
+    width: 80%;
+    margin-left: 2rem;
+    justify-content: left;
+  }
+  
+  /* Reduce left padding on smaller screens */
+  @media (max-width: 768px) {
+    .admin-section-padding {
+      padding-inline-start: -3rem;
+    }
+  }
+  @media (max-width: 1028px) {
+    .admin-section-padding {
+      padding-inline-start: -2rem;
+      width: 100%;
+    }
+  }
+
+
+ 
+  
+  /* Between 500px and 1200px, add left margin */
+  @media (min-width: 500px) and (max-width: 1500px) {
+    .admin-table-borrow {
+      margin-left: 5rem;
+      margin-right: 0; /* optional: avoid unnecessary right margin */
+    }
+  }
+  
+  
