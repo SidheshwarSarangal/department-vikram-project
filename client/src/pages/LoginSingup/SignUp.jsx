@@ -110,6 +110,23 @@ const SignUp = () => {
     console.log(user);
   };
   const submitForm = async () => {
+
+    const email = user.username || "";
+
+    // Validate email domain
+    const isValidIITREmail = email.endsWith("@bt.iitr.ac.in") || email.endsWith("@be.iitr.ac.in");
+
+    if (!isValidIITREmail) {
+      toast.error("Invalid email id", {
+        position: "top-center",
+        autoClose: 2000,
+        pauseOnHover: false,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        style: { textAlign: "center" }
+      });
+      return; // prevent form submission
+    }
     // alert("Submitted")
     await axios
       .post(`http://localhost:5000/register`, user)
