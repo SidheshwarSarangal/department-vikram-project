@@ -20,8 +20,7 @@ const Lists = ({ user }) => {
     console.log(filter);
   };
 
-  //handle clicks
-  // console.log(user);
+
 
   const addToCartCaller = async (send) => {
     try {
@@ -90,21 +89,7 @@ const Lists = ({ user }) => {
       setData([]); // Ensure data does not remain undefined
     }
   };
-  /*const fetchData = async () => {
-    // setInterval(async () => {
-    let search = filter.search;
-    if (search.length == 0) {
-      search = "-";
-    }
 
-    const response = await axios.get(`http://localhost:5000/search/${search}`);
-    if (response.length == 0) {
-      response = await axios.get(`http://localhost:5000/allBook`);
-    }
-    setData(response.data.books);
-    // }, 1500);
-  };*/
-  // console.log(data);
 
 
 
@@ -201,6 +186,7 @@ const Lists = ({ user }) => {
                       <th style={{ width: "15rem" }}>Name</th>
                       <th style={{ width: "15rem" }}>Publisher</th>
                       <th style={{ width: "15rem" }}>Genre</th>
+                      <th style={{ width: "15rem" }}>Copies Available</th>
                       <th style={{ width: "10rem" }}>Add To Cart</th>
                     </tr>
                   </thead>
@@ -216,6 +202,7 @@ const Lists = ({ user }) => {
                         </td>
                         <td>{d.Author || "Unknown Author"}</td>
                         <td>{d.Genre || "Uncategorized"}</td>
+                        <td>{d.ItemCount || "0"}</td>
                         <td>
                           <input
                             type="checkbox"

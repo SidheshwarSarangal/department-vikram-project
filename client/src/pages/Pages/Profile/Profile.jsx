@@ -90,7 +90,6 @@ const Profile = ({ user }) => {
   }, [user]);
   const handleInputs = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
-    // setData({ ...data, uniqueId: user.uniqueId });
   };
 
 
@@ -122,7 +121,6 @@ const Profile = ({ user }) => {
           setTimeout(() => {
             window.location.href = "/profile";
           }, 1500);
-          // window.location.reload();
         } else if (status === 202) {
           toast.warn(`${message}`, {
             position: "top-center",
@@ -257,37 +255,47 @@ const Profile = ({ user }) => {
               Joined on{" "}
               <span style={{ color: "#a0a2a1" }}>{formattedDate}</span>
             </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontFamily: "poppins",
-                marginBlockStart: "0.5rem",
-                fontWeight: "600",
-                fontSize: "1rem",
-                color: "white",
-              }}
-            >
-              {user.borrowed.length} <a href="/cart" style={{ color: "#2bea2b", textDecoration: "none" }}>Borrowed</a>
-            </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontFamily: "poppins",
-                marginBlockStart: "0.5rem",
-                fontWeight: "600",
-                fontSize: "1rem",
-                color: "white",
-              }}
-            >
-              <span style={{ color: "yellow" }}> {user.cart.length} </span>{" "}
-              items in{" "}
-              <a
-                style={{ color: "#539cda", textDecoration: "none" }}
-                href="/cart"
-              >
-                cart
-              </a>
-            </div>
+            {user.userType === "user" && (
+              <>
+                <div
+                  style={{
+                    textAlign: "center",
+                    fontFamily: "poppins",
+                    marginBlockStart: "0.5rem",
+                    fontWeight: "600",
+                    fontSize: "1rem",
+                    color: "white",
+                  }}
+                >
+                  {user.borrowed.length}{" "}
+                  <a
+                    href="/cart"
+                    style={{ color: "#2bea2b", textDecoration: "none" }}
+                  >
+                    Borrowed
+                  </a>
+                </div>
+                <div
+                  style={{
+                    textAlign: "center",
+                    fontFamily: "poppins",
+                    marginBlockStart: "0.5rem",
+                    fontWeight: "600",
+                    fontSize: "1rem",
+                    color: "white",
+                  }}
+                >
+                  <span style={{ color: "yellow" }}> {user.cart.length} </span> items in{" "}
+                  <a
+                    style={{ color: "#539cda", textDecoration: "none" }}
+                    href="/cart"
+                  >
+                    cart
+                  </a>
+                </div>
+              </>
+            )}
+
           </div>
         </div>
         <div style={{ flex: "3", display: "flex", flexDirection: "column" }}>
@@ -330,26 +338,7 @@ const Profile = ({ user }) => {
                   onChange={(e) => handleInputs(e)}
                 />
               </div>
-              {/* <div
-                style={{
-                  margin: "0.5rem",
-                  display: "flex",
-                  padding: "0.5rem",
-                }}
-              >
-                {/*
-                <input
-                  style={{ width: "60%" }}
-                  type="email"
-                  className="login-input"
-                  name="username"
-                  placeholder="Email"
-                  defaultValue={user.username}
-                  onChange={(e) => handleInputs(e)}
-                />
-               }
-              </div>
-                */}
+
               <div
                 style={{
                   margin: "0.5rem",
@@ -433,6 +422,7 @@ const Profile = ({ user }) => {
                       <button
                         type="submit"
                         className="profile-button"
+
                       >
                         Submit
                       </button>

@@ -1,105 +1,11 @@
 import { Button } from "bootstrap";
 import "../Assets/css/login.css";
-// import { FaLock, FaLockOpen, FaUser, FaAngleLeft } from "react-icons/fa";
-// import { CSSTransition } from "react-transition-group";
+
 import React, { useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// const First = () => {
-//   const [user, setUser] = useState({});
-
-//   const handleInputs = (e) => {
-//     setUser({ ...user, [e.target.name]: e.target.value });
-//     console.log(user);
-//   };
-//   const submitForm = async () => {
-//     // alert("Submitted")
-//     await axios
-//       .post(`http://localhost:5000/register`, user)
-//       .then((response) => {
-//         var message = response.data.msg;
-//         var status = response.status;
-//         console.log(message);
-
-//         if (status === 200) {
-//           toast.success(`${message}`, {
-//             position: "top-center",
-//             autoClose: 2000,
-//             pauseOnHover: false,
-//             pauseOnFocusLoss: false,
-//             draggable: true,
-//             textAlign: "center",
-//           });
-
-//           // window.location.reload();
-//         } else if (status === 202) {
-//           toast.warn(`${message}`, {
-//             position: "top-center",
-//             autoClose: 2000,
-//             pauseOnHover: false,
-//             pauseOnFocusLoss: false,
-//             draggable: true,
-//             textAlign: "center",
-//           });
-//         }
-//       });
-//   };
-
-//   return (
-//     <div className="login-form">
-//       <div className="login-field">
-//         <i className="login-icon fas fa-user"> </i>
-//         <input
-//           type="text"
-//           className="login-input"
-//           name="companyName"
-//           placeholder="Company Name"
-//           onChange={(e) => handleInputs(e)}
-//         />
-//       </div>
-//       <div className="login-field">
-//         <i className="login-icon fas fa-user"> </i>
-//         <input
-//           name="username"
-//           type="text"
-//           className="login-input"
-//           placeholder="Email"
-//           onChange={(e) => handleInputs(e)}
-//         />
-//       </div>
-//       <div className="login-field ">
-//         <input
-//           type="password"
-//           className="login-input"
-//           placeholder="Password"
-//           name="password"
-//           onChange={(e) => handleInputs(e)}
-//         />
-//       </div>
-//       <div className="login-field">
-//         <i className="login-icon fas fa-user"> </i>
-//         <input
-//           type="text"
-//           className="login-input"
-//           name="userType"
-//           placeholder="User Type (manufacturer/airlines/recycling)"
-//           onChange={(e) => handleInputs(e)}
-//         />
-//       </div>
-//       <a href="/signup">
-//         <button
-//           onClick={() => submitForm()}
-//           style={{ padding: "1rem", width: "9rem", borderRadius: "2rem" }}
-//         >
-//           Sign Up
-//         </button>
-//       </a>
-//       <ToastContainer />
-//     </div>
-//   );
-// };
 const SignUp = () => {
   const [showComponent1, setShowComponent1] = useState(true);
 

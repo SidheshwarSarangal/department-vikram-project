@@ -4,7 +4,6 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Navigate, useNavigate } from "react-router-dom";
-// import { FaEnvelope, FaLock, FaLockOpen, FaUser } from "react-icons/fa";
 import img2 from "../../../src/pages/Assets/logins.jpg";
 import img from "./department.webp";
 

@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect } from "react";
 import "../Assets/css/landing.css";
 import img2 from "./landingpage.jpg";

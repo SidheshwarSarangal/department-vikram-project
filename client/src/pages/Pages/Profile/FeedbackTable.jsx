@@ -129,8 +129,8 @@ const FeedbackTable = ({ user }) => {
         <tbody>
           {feedbackList.map((item) => (
             <tr key={item._id}>
-              <td>{item.username}</td>
-              <td>{item.phone}</td>
+              <td className="query-snippet" onClick={() => setSelectedFeedback(item)}>{item.username}</td>
+              <td className="query-snippet" onClick={() => setSelectedFeedback(item)}>{item.phone}</td>
               <td className="query-snippet" onClick={() => setSelectedFeedback(item)}>
                 {item.feedback.length > 40 ? item.feedback.slice(0, 40) + '...' : item.feedback}
               </td>
@@ -176,7 +176,7 @@ const FeedbackTable = ({ user }) => {
           <div className="popup-content" onClick={(e) => e.stopPropagation()}>
             <h3>Full Query from {selectedFeedback.username}</h3>
             <p>{selectedFeedback.feedback}</p>
-            <span onClick={handlePopupClose} className="profile-button">Close</span>
+            <span onClick={handlePopupClose} className="profile-button" style={{color:"gray", ":hover": { color: "white" }}}>Close</span>
           </div>
         </div>
       )}

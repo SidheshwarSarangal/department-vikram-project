@@ -47,28 +47,16 @@ const BorrowList = () => {
 
 
 
-  const addToCart = async () => {
-    //   const books = selectedBooks;
-    //   const username = user.username;
-    //   const send = { books: books, username: username };
-    //   console.log(send);
-    //   await axios
-    //     .post(`http://localhost:5000/addToCart`, send, {})
-    //     .then((response) => {
-    //       console.log(response);
-    //     });
-    //   setTimeout(() => {
-    //     window.location.href = "/cart";
-    //   }, 500);
-  };
-  // console.log(selectedBooks);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const response = await axios.get("http://localhost:5000/borrowedBooks");
       if (Array.isArray(response.data)) {
-        setData(response.data);
+        const sortedData = response.data.sort((a, b) =>
+          a.borrower.localeCompare(b.borrower)
+        );
+        setData(sortedData);
       } else if (Array.isArray(response.data.borrowedBooks)) {
         setData(response.data.borrowedBooks);
       } else {
@@ -110,19 +98,7 @@ const BorrowList = () => {
       return formattedDate;
     }
   }
-  /*
-    const handleCheckboxChange = (e, id) => {
-      if (e.target.checked) {
-        setSelectedBooks((prevSelectedBooks) => [...prevSelectedBooks, id]);
-      } else {
-        setSelectedBooks((prevSelectedBooks) =>
-          prevSelectedBooks.filter((bookId) => bookId !== id)
-        );
-      }
-      console.log(selectedBooks);
-    };
-  */
-  //variables
+
   const [currentPage, setCurrentPage] = useState(1);
   const recordPerPage = 10;
   const lastIndex = currentPage * recordPerPage;
@@ -156,7 +132,7 @@ const BorrowList = () => {
         draggable: true,
         textAlign: "center",
       });
-      
+
 
       // Optional delay before reload so user can read the toast
       setTimeout(() => {
@@ -173,24 +149,7 @@ const BorrowList = () => {
   };
 
 
-  const handleReturn = async (book) => {
-    try {
-      const payload = {
-        uniqueId: book.uid,     // user ID from the book object
-        isbn: [book.isbn],      // send as an array of ISBNs
-      };
 
-      const response = await axios.post('http://localhost:5000/return', payload);
-
-      if (response.status === 200) {
-        alert("Book returned successfully!");
-        window.location.reload(); // or update state instead
-      }
-    } catch (error) {
-      console.error("Error returning book:", error);
-      alert("Failed to return book.");
-    }
-  };
 
 
   const handleRemoveFromCart = async (username, isbn) => {
@@ -237,6 +196,7 @@ const BorrowList = () => {
         margin: "1rem",
         borderRadius: "1.5rem",
         padding: "0.5rem",
+        cursor: "default"
       }}
     >
       <div style={{ position: "relative", height: "3rem", marginBottom: "2rem" }}>
@@ -299,30 +259,23 @@ const BorrowList = () => {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Unique ID</th>
                     <th>Borrower</th>
+                    <th>Unique ID</th>
                     <th>Book Name</th>
                     <th>Author</th>
                     <th>Due/Borrowed Date</th>
-                    {/* <th>Returned</th> */}
                   </tr>
                 </thead>
                 <tbody>
                   {record.map((d, i) => (
                     <tr key={d.isbn || i}>
                       <td>{(currentPage - 1) * 10 + i + 1}</td>
-                      <td>{d.uid}</td>
                       <td>{d.borrower}</td>
+                      <td>{d.uid}</td>
                       <td>{d.title}</td>
                       <td>{d.author}</td>
                       <td>{formatDate(d.takenDate)}</td>
-                      {/*<td>
-                      <input
-                      type="checkbox"
-                      onChange={(e) => handleCheckboxChange(e, d.isbn)}
-                      checked={selectedBooks.includes(d.isbn)}
-                      />
-                      </td>*/}
+
                     </tr>
                   ))}
                 </tbody>
@@ -368,16 +321,7 @@ const BorrowList = () => {
               </div>
             </div>
 
-            {/*<div style={{ marginLeft: "45rem" }}>
-              <div className="land-button" style={{ cursor: "pointer" }} onClick={addToCart}>
-                <a className="landing-button-hover" style={{ width: "12rem" }}>
-                  <span>SAVE CHANGE</span>
-                </a>
-              </div>
-              <div style={{ marginLeft: "8.4rem" }}>
-                Save Returned Status of Borrower
-              </div>
-            </div>*/}
+
           </div>
 
           <div>
@@ -450,11 +394,10 @@ const BorrowList = () => {
               >
                 <tr>
                   <th style={{ padding: "1rem", textAlign: "left", width: "5rem" }}>#</th>
-                  <th style={{ padding: "1rem", textAlign: "left", width: "15rem" }}>User ID</th>
+                  <th style={{ padding: "1rem", textAlign: "left", width: "15rem" }}>Username</th>
                   <th style={{ padding: "1rem", textAlign: "left", width: "15rem" }}>Genre</th>
                   <th style={{ padding: "1rem", textAlign: "left", width: "20rem" }}>Title</th>
                   <th style={{ padding: "1rem", textAlign: "left", width: "15rem" }}>Publisher</th>
-                  {/* <th style={{ padding: "1rem", textAlign: "left", width: "10rem" }}>Item Count</th>*/}
                   <th style={{ padding: "1rem", textAlign: "left", width: "12rem" }}>Remove</th>
                   <th style={{ padding: "1rem", textAlign: "left", width: "10rem" }}>Checkout</th>
                 </tr>
@@ -482,7 +425,6 @@ const BorrowList = () => {
                         <td style={{ padding: "1rem", color: "#333" }}>{book.Genre}</td>
                         <td style={{ padding: "1rem", color: "#333" }}>{book.Title}</td>
                         <td style={{ padding: "1rem", color: "#333" }}>{book.Publisher}</td>
-                        {/* <td style={{ padding: "1rem", color: "#333" }}>{book.ItemCount}</td> */}
                         <td style={{ padding: "1rem" }}>
                           <button
                             style={{

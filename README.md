@@ -57,8 +57,36 @@ npm start
 
 ## Landing Page
 
-## Home Page
+Here you can ckick on GO!! to move to login/signup page
+
+## Login/Signup
+
+Here you can Login
+You can create a new account with your valid email provided by the institute. Note: the email will work only if you belong to Biotech department.
+
+## Profile Page
+
+The page will contain your personal information.
+You can edit your name, phone number and Address.
+For users, there will be a feedback form. Users can put queries to that. There will also be a table below that mentioning the queries put up by the user and their status. The users can delete them as well.
+For admin, the table will contain all the queries so far. The admin can change their statuses to accepted or rejected. The admin can also delete any query.
+
+## Books Page
+
+This page contains the information about the Library
+For admin, it contains the list of users sorted with their username from top to bottom.
+For users, it contains the list of books available and option to put to cart.
 
 ## Cart Page
 
-## Member List And Borrower Page
+This page is for users.
+The users can see what all books they have in cart to get approved by the admin and what all books they have borrowed.
+The borrowed books can be returned from here.
+
+## Check-Borrow Page
+
+This page is for admin.
+The checklist is set in sorted order of username.
+The adin can approve or remove books from checklist for individual users.
+The individual books can be removed one by one but CHECKOUT will be done only once for a user with all the books that have not been removed from checklist.  
+The page also contains the list of books that have been borrowed in sorted order of user.

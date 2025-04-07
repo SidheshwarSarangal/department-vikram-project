@@ -7,8 +7,7 @@ const AllMember = ({ user }) => {
   const [selectedBooks, setSelectedBooks] = useState([]);
   const navigate = useNavigate();
 
-  //handle clicks
-  // console.log(user);
+
   const addToCart = async () => {
     const books = selectedBooks;
     const username = user.username;
@@ -28,7 +27,8 @@ const AllMember = ({ user }) => {
   const fetchData = async () => {
     // setInterval(async () => {
     const response = await axios.get("http://localhost:5000/allUser");
-    setData(response.data);
+    const sortedData = response.data.sort((a, b) => a.username.localeCompare(b.username));
+    setData(sortedData);
     // }, 1500);
   };
   // console.log(data);
@@ -75,7 +75,6 @@ const AllMember = ({ user }) => {
     <div
       style={{
         display: "flex",
-        // border: "1px solid grey",
         boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
         flexDirection: "column",
         justifyContent: "center",
@@ -86,20 +85,7 @@ const AllMember = ({ user }) => {
     >
       {data.length > 0 ? (
         <>
-          <div>
-            {/* <img
-              className="vert-move"
-              style={{
-                width: "40%",
-                marginLeft: "30%",
-                // marginRight: "50%",
-                // height: "30%",
-              }}
-              src="https://raw.githubusercontent.com/AnuragRoshan/images/3847f7937af6b50213195fa6db1a49f5e3194e21/undraw_team_page_re_cffb.svg"
-              alt=""
-              srcSet=""
-            /> */}
-          </div>
+          
 
           <div
             style={{
@@ -122,9 +108,9 @@ const AllMember = ({ user }) => {
             }}>
               <thead style={{ backgroundColor: "#3d5a80", color: "white" }}>
                 <th style={{ width: "5rem", textAlign: "left" }}>#</th>
+                <th style={{ width: "15rem", textAlign: "left" }}>Username</th>
                 <th style={{ width: "15rem", textAlign: "left" }}>Name</th>
                 <th style={{ width: "15rem", textAlign: "left" }}>UID</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>email</th>
                 <th style={{ width: "15rem", textAlign: "left" }}>Phone</th>
                 <th style={{ width: "15rem", textAlign: "left" }}>Status</th>
               </thead>
@@ -132,6 +118,7 @@ const AllMember = ({ user }) => {
                 {record.map((d, i) => (
                   <tr>
                     <td style={{}}>{(currentPage - 1) * 10 + i + 1}</td>
+                    <td style={{ padding: "0.5rem" }}>{d.username}</td>
                     <td
                       style={{ cursor: "pointer", padding: "0.5rem" }}
                       onClick={() => handleBookClick(d.uniqueId)}
@@ -140,7 +127,6 @@ const AllMember = ({ user }) => {
                       {d.name}
                     </td>
                     <td style={{ padding: "0.5rem" }}>{d.uniqueId}</td>
-                    <td style={{ padding: "0.5rem" }}>{d.username}</td>
                     <td style={{ padding: "0.5rem" }}>{d.phone}</td>
                     <td style={{ padding: "0.5rem" }}>
                       {d.borrowed.length == 0 ? (
