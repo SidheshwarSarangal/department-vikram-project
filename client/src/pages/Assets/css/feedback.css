@@ -19,8 +19,11 @@
   
   /* Header */
   .feedback-table thead {
-    background-color: #3d5a80;
+    background-color: #4393fc;
     color: white;
+  }
+  .feedback-table thead tr:hover {
+    background-color: inherit !important;
   }
   
   .feedback-table th {

@@ -36,5 +36,6 @@ router.put('/feedbackAccept/:id/', feedbackController.setStatusAcceptedAndClose)
 router.put('/feedbackReject/:id/', feedbackController.setStatusRejectedAndClose);
 router.get('/getAllFeedbacks', feedbackController.viewAllQuery);
 router.get('/getUserFeedbacks/:username', feedbackController.viewUserQuery);
+router.put('/makeStatusSubmitted/:id', feedbackController.makeStatusSubmitted);
 
 module.exports = router;

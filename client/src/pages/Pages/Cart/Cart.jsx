@@ -202,7 +202,7 @@ const Cart = ({ user }) => {
                         <div style={{ display: "flex" }}>
                           <div>
                             <img
-                              src="https://covers.openlibrary.org/b/isbn/1933988746-L.jpg"
+                              src="https://miro.medium.com/v2/resize:fit:1200/1*d5VjR-g8k6hSXWA4n0czXQ.jpeg"
                               alt=""
                               style={{
                                 width: "5rem",

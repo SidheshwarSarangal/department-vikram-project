@@ -1,13 +1,25 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../Assets/css/adminBorrow.css"
+import "../../Assets/css/adminBorrow.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const BorrowList = () => {
   const [data, setData] = useState([]);
   const [selectedBooks, setSelectedBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cartBooks, setCartBooks] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+
+  const handleCheckoutClick = (username) => {
+    setCurrentUser(username);
+    setShowPopup(true);
+  };
+
 
 
   const navigate = useNavigate();
@@ -63,6 +75,7 @@ const BorrowList = () => {
         console.warn("Unexpected format:", response.data);
         setData([]);
       }
+      console.log(response);
     } catch (err) {
       console.error("Error fetching borrowed books:", err);
       setData([]);
@@ -97,18 +110,18 @@ const BorrowList = () => {
       return formattedDate;
     }
   }
-
-  const handleCheckboxChange = (e, id) => {
-    if (e.target.checked) {
-      setSelectedBooks((prevSelectedBooks) => [...prevSelectedBooks, id]);
-    } else {
-      setSelectedBooks((prevSelectedBooks) =>
-        prevSelectedBooks.filter((bookId) => bookId !== id)
-      );
-    }
-    console.log(selectedBooks);
-  };
-
+  /*
+    const handleCheckboxChange = (e, id) => {
+      if (e.target.checked) {
+        setSelectedBooks((prevSelectedBooks) => [...prevSelectedBooks, id]);
+      } else {
+        setSelectedBooks((prevSelectedBooks) =>
+          prevSelectedBooks.filter((bookId) => bookId !== id)
+        );
+      }
+      console.log(selectedBooks);
+    };
+  */
   //variables
   const [currentPage, setCurrentPage] = useState(1);
   const recordPerPage = 10;
@@ -129,21 +142,36 @@ const BorrowList = () => {
     }
   };
 
-
   const proceedCheckout = async (username) => {
-    const send = { username: username };
+    const send = { username };
     try {
       const response = await axios.post(`http://localhost:5000/checkout`, send);
       console.log("Checkout response:", response);
-      alert(`Checkout successful for ${username}`);
-      // Optionally refresh the cart list
-      window.location.reload();
+
+      toast.success(`Checkout successful for ${username}`, {
+        position: "top-center",
+        autoClose: 2000,
+        pauseOnHover: false,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        textAlign: "center",
+      });
+      
+
+      // Optional delay before reload so user can read the toast
+      setTimeout(() => {
+        window.location.reload();
+      }, 2500);
 
     } catch (error) {
       console.error("Checkout failed:", error);
-      alert("Checkout failed");
+      toast.error("Checkout failed. Please try again.", {
+        position: 'top-right',
+        autoClose: 3000,
+      });
     }
   };
+
 
   const handleReturn = async (book) => {
     try {
@@ -164,6 +192,7 @@ const BorrowList = () => {
     }
   };
 
+
   const handleRemoveFromCart = async (username, isbn) => {
     try {
       const res = await axios.post("http://localhost:5000/removeFromCart", {
@@ -171,10 +200,23 @@ const BorrowList = () => {
         isbn,
       });
       console.log("Removed:", res.data);
-      // Refresh the cartBooks list
-      fetchCartBooks(); // Your function to re-fetch the updated cart
+
+      toast.success("Book removed from cart.", {
+        position: "top-center",
+        autoClose: 2000,
+        pauseOnHover: false,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        textAlign: "center",
+      });
+
+      fetchCartBooks(); // Refresh the list after removal
     } catch (err) {
       console.error("Failed to remove book:", err);
+      toast.error("Failed to remove book. Please try again.", {
+        position: 'top-right',
+        autoClose: 3000,
+      });
     }
   };
 
@@ -257,6 +299,7 @@ const BorrowList = () => {
                 <thead>
                   <tr>
                     <th>#</th>
+                    <th>Unique ID</th>
                     <th>Borrower</th>
                     <th>Book Name</th>
                     <th>Author</th>
@@ -268,6 +311,7 @@ const BorrowList = () => {
                   {record.map((d, i) => (
                     <tr key={d.isbn || i}>
                       <td>{(currentPage - 1) * 10 + i + 1}</td>
+                      <td>{d.uid}</td>
                       <td>{d.borrower}</td>
                       <td>{d.title}</td>
                       <td>{d.author}</td>
@@ -410,9 +454,9 @@ const BorrowList = () => {
                   <th style={{ padding: "1rem", textAlign: "left", width: "15rem" }}>Genre</th>
                   <th style={{ padding: "1rem", textAlign: "left", width: "20rem" }}>Title</th>
                   <th style={{ padding: "1rem", textAlign: "left", width: "15rem" }}>Publisher</th>
-                 {/* <th style={{ padding: "1rem", textAlign: "left", width: "10rem" }}>Item Count</th>*/}
-                  <th style={{ padding: "1rem", textAlign: "left", width: "10rem" }}>Checkout</th>
+                  {/* <th style={{ padding: "1rem", textAlign: "left", width: "10rem" }}>Item Count</th>*/}
                   <th style={{ padding: "1rem", textAlign: "left", width: "12rem" }}>Remove</th>
+                  <th style={{ padding: "1rem", textAlign: "left", width: "10rem" }}>Checkout</th>
                 </tr>
               </thead>
               <tbody>
@@ -438,24 +482,7 @@ const BorrowList = () => {
                         <td style={{ padding: "1rem", color: "#333" }}>{book.Genre}</td>
                         <td style={{ padding: "1rem", color: "#333" }}>{book.Title}</td>
                         <td style={{ padding: "1rem", color: "#333" }}>{book.Publisher}</td>
-                       {/* <td style={{ padding: "1rem", color: "#333" }}>{book.ItemCount}</td> */}
-                        <td style={{ padding: "1rem" }}>
-                          {showCheckout && (
-                            <button
-                              style={{
-                                padding: "0.4rem 1rem",
-                                backgroundColor: "#3d5a80",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "0.5rem",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => proceedCheckout(book.username)}
-                            >
-                              Checkout
-                            </button>
-                          )}
-                        </td>
+                        {/* <td style={{ padding: "1rem", color: "#333" }}>{book.ItemCount}</td> */}
                         <td style={{ padding: "1rem" }}>
                           <button
                             style={{
@@ -471,15 +498,56 @@ const BorrowList = () => {
                             Remove from Cart
                           </button>
                         </td>
+                        <td style={{ padding: "1rem" }}>
+                          {showCheckout && (
+                            <button
+                              style={{
+                                padding: "0.4rem 1rem",
+                                backgroundColor: "#3d5a80",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "0.5rem",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => handleCheckoutClick(book.username)}
+                            >
+                              Checkout
+                            </button>
+                          )}
+                        </td>
+
                       </tr>
                     );
                   });
                 })()}
               </tbody>
             </table>
+
+            {showPopup && currentUser && (
+              <div className="popup-overlay">
+                <div className="popup">
+                  <p>All the books for <strong>{currentUser}</strong> will be checked out together. So make sure youremoved the ones which cannot be borrowed. Do You want to checkout them all?</p>
+                  <div style={{ marginTop: "1rem" }}>
+                    <button
+                      onClick={() => proceedCheckout(currentUser)}
+                      className="confirm-btn"
+                    >
+                      Yes
+                    </button>
+                    <button
+                      onClick={() => setShowPopup(false)}
+                      className="cancel-btn"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         ) : (
-          <p>No books in cart.</p>
+          <h1 style={{ marginLeft: "4rem" }}>No books in cart.</h1>
         )}
 
       </div>

@@ -86,6 +86,26 @@ exports.setStatusRejectedAndClose = async (req, res) => {
   }
 };
 
+exports.makeStatusSubmitted = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedFeedback = await Feedback.findByIdAndUpdate(
+      id,
+      { status: 'submitted' },
+      { new: true }
+    );
+
+    if (!updatedFeedback) {
+      return res.status(404).json({ message: 'Feedback not found' });
+    }
+
+    res.status(200).json({ message: 'Feedback marked as submitted', feedback: updatedFeedback });
+  } catch (error) {
+    console.error('Error updating feedback status to submitted:', error);
+    res.status(500).json({ message: 'Server error. Please try again later.' });
+  }
+};
+
 
 exports.viewAllQuery = async (req, res) => {
   try {
