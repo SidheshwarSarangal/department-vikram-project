@@ -21,9 +21,6 @@ const Profile = ({ user }) => {
     e.preventDefault();
 
     try {
-      console.log(user.username);
-      console.log(user.phone);
-      console.log(feedback);
 
       const response = await fetch('http://localhost:5000/addFeedback', {
         method: 'POST',
@@ -86,7 +83,6 @@ const Profile = ({ user }) => {
 
 
   useEffect(() => {
-    console.log("User data on refresh:", user);
   }, [user]);
   const handleInputs = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -107,7 +103,6 @@ const Profile = ({ user }) => {
       .then((response) => {
         var message = response.data.msg;
         var status = response.status;
-        console.log(message);
 
         if (status === 200) {
           toast.success(`${message}`, {

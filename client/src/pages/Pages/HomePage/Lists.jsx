@@ -17,7 +17,6 @@ const Lists = ({ user }) => {
 
   const handleInputs = (e) => {
     setfilter({ ...filter, [e.target.name]: e.target.value });
-    console.log(filter);
   };
 
 
@@ -25,7 +24,6 @@ const Lists = ({ user }) => {
   const addToCartCaller = async (send) => {
     try {
       const response = await axios.post("http://localhost:5000/addToCart", send);
-      console.log("Response from server:", response.data);
       return { result: true, message: "added to cart" };
     } catch (error) {
       const errorMsg =

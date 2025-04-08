@@ -74,19 +74,18 @@ For admin, the table will contain all the queries so far. The admin can change t
 ## Books Page
 
 This page contains the information about the Library
-For admin, it contains the list of users sorted with their username from top to bottom.
-For users, it contains the list of books available and option to put to cart.
+For admin, it contains the list of users sorted with their username from top to bottom. The admin the also search them with name or username. The admin can also see the list of books available and use its search bar to search with book title, author or genre.
+For users, it contains the list of books available and option to put to cart. The user can use the search bar to search with book title, author or genre.
 
 ## Cart Page
 
 This page is for users.
 The users can see what all books they have in cart to get approved by the admin and what all books they have borrowed.
-The borrowed books can be returned from here.
+The user can request to return a book here.
 
 ## Check-Borrow Page
 
 This page is for admin.
-The checklist is set in sorted order of username.
+The checklist is set in sorted order of username. He can also use search bar to search book, borrower or author. The status column shows status as borrowed or accept return button. If a user has put request to return then the admin can accept it using return accept button which will be visible in the status column aginst that book.
 The adin can approve or remove books from checklist for individual users.
-The individual books can be removed one by one but CHECKOUT will be done only once for a user with all the books that have not been removed from checklist.  
-The page also contains the list of books that have been borrowed in sorted order of user.
+The admin can also cheout the books individually.

@@ -16,7 +16,6 @@ const Cart = ({ user }) => {
       const response = await axios.get(
         `http://localhost:5000/booksInCart/${user.username}`
       );
-      console.log("Cart response:", response.data);
 
       // ✅ Ensure data is always an array
       setData(response.data.books || []);
@@ -32,15 +31,11 @@ const Cart = ({ user }) => {
   const fetchBorrowedBooks = async () => {
     try {
       const response = await axios.get(`http://localhost:5000/borrowedBooks`);
-      console.log(response.data);
-      console.log(user.uniqueId);
       const userBooks = response.data.filter((book) => {
-        console.log("uid", book.uid);
         return book.uid === user.uniqueId;
       });
 
       setBorrowedBooks(userBooks);
-      console.log("borrowedbooks", userBooks);
     } catch (error) {
       console.error("Error fetching borrowed books:", error);
       setBorrowedBooks([]);
@@ -54,7 +49,6 @@ const Cart = ({ user }) => {
     await axios
       .post(`http://localhost:5000/checkout`, send)
       .then((response) => {
-        console.log(response);
       });
     setTimeout(() => {
       window.location.href = "/home";
@@ -74,12 +68,10 @@ const Cart = ({ user }) => {
         uniqueId: user.uniqueId,  // ✅ use uniqueId, not username
         isbn: book.isbn,
       };
-      console.log("payload", payload);
 
       const response = await axios.post("http://localhost:5000/returnStatusBook", payload);
 
       if (response.status === 200) {
-        console.log(response);
         toast.success("Book returned successfully!", {
           position: "top-center",
           autoClose: 2000,

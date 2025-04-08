@@ -27,13 +27,11 @@ const BorrowList = () => {
 
 
   const navigate = useNavigate();
-  console.log(data);
 
 
   const fetchCartBooks = async () => {
     try {
       const response = await axios.get("http://localhost:5000/allBooksInCart");
-      console.log(response.data.books);
 
       if (Array.isArray(response.data.books)) {
         const sortedBooks = response.data.books.sort((a, b) =>
@@ -73,7 +71,6 @@ const BorrowList = () => {
         return a.borrower.localeCompare(b.borrower); // fallback sort
       });
 
-      console.log(result);
 
       setOriginalData(result);
       setData(result);
@@ -155,7 +152,6 @@ const BorrowList = () => {
     const send = { username, isbn };
     try {
       const response = await axios.post(`http://localhost:5000/checkout`, send);
-      console.log("Checkout response:", response);
 
       toast.success(`Checked out book ISBN: ${isbn}`, {
         position: "top-center",
@@ -219,7 +215,6 @@ const BorrowList = () => {
         username,
         isbn,
       });
-      console.log("Removed:", res.data);
 
       toast.success("Book removed from cart.", {
         position: "top-center",
