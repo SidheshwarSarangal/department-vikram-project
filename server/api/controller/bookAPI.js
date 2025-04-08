@@ -101,8 +101,8 @@ exports.addToCart = async (req, res) => {
             console.log(book)
             if (book.ItemCount > 0) {
                 // Decrease item count of the book
-                // book.ItemCount -= 1;
-                // await book.save();
+                book.ItemCount -= 1;
+                await book.save();
 
                 // Add ISBN to user's cart
                 // user.cart.push(ISBN);
@@ -124,92 +124,123 @@ exports.addToCart = async (req, res) => {
 
 
 
-
 exports.checkout = async (req, res) => {
     try {
-        const { username } = req.body;
-        console.log(username);
+        const { username, isbn } = req.body;
+
+        if (!username || !isbn) {
+            return res.status(400).json({ msg: "Username and ISBN are required" });
+        }
+
         const user = await userSchema.findOne({ username });
-
         if (!user) {
-            return res.status(400).json({ msg: "User not found" });
+            return res.status(404).json({ msg: "User not found" });
         }
 
-        const booksInCart = user.cart;
-        const borrowedBooks = [];
-
-        for (let i = 0; i < booksInCart.length; i++) {
-            const isbn = booksInCart[i].isbn;
-            const book = await bookSchema.findOne({ ISBN: isbn });
-
-            if (!book) {
-                return res.status(400).json({ msg: `Book with ISBN ${isbn} not found` });
-            }
-
-            if (book.ItemCount > 0) {
-                // Decrease item count of the book
-                book.ItemCount -= 1;
-                await book.save();
-
-                // Add book to borrowed array
-                borrowedBooks.push({
-                    isbn: book.ISBN,
-                    takenDate: new Date(),// Set the due date as per your requirements
-
-                });
-            } else {
-                return res.status(400).json({ msg: `Book with ISBN ${isbn} is out of stock` });
-            }
+        const bookIndex = user.cart.findIndex(item => item.isbn === isbn);
+        if (bookIndex === -1) {
+            return res.status(400).json({ msg: "Book not found in user's cart" });
         }
 
-        // Empty the user's cart and update the borrowed books
-        user.cart = [];
-        user.borrowed = [...user.borrowed, ...borrowedBooks];
+        const book = await bookSchema.findOne({ ISBN: isbn });
+        if (!book) {
+            return res.status(404).json({ msg: "Book not found in inventory" });
+        }
+
+        if (book.ItemCount <= 0) {
+            return res.status(400).json({ msg: "Book is out of stock" });
+        }
+
+        // Update inventory
+        //book.ItemCount -= 1;
+        //await book.save();
+
+        // Add to borrowed list
+        user.borrowed.push({ isbn, takenDate: new Date(), status: "borrowed" });
+
+        // Remove from cart
+        user.cart.splice(bookIndex, 1);
+
         await user.save();
 
-        return res.status(200).json({ msg: "Checkout successful" });
+        return res.status(200).json({ msg: `Book with ISBN ${isbn} checked out successfully` });
     } catch (error) {
-        throw error;
+        console.error(error);
+        return res.status(500).json({ msg: "Server error" });
     }
+};
 
+exports.returnStatusBook = async (req, res) => {
+    try {
+        const { uniqueId, isbn } = req.body;
+
+        if (!uniqueId || !isbn) {
+            return res.status(400).json({ msg: "Unique ID and ISBN are required" });
+        }
+
+        const user = await userSchema.findOne({ uniqueId });
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        const borrowedEntry = user.borrowed.find(
+            entry => entry.isbn === isbn && entry.status === "borrowed"
+        );
+
+        if (!borrowedEntry) {
+            return res.status(404).json({ msg: "Borrowed book not found or already returning/returned" });
+        }
+
+        // ✅ Update the status
+        borrowedEntry.status = "returning";
+        user.markModified("borrowed");
+
+        await user.save();
+
+        return res.status(200).json({ msg: `Status updated to 'returning' for ISBN ${isbn}` });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: "Server error" });
+    }
 };
 
 exports.returnBooks = async (req, res) => {
     try {
         const { uniqueId, isbn } = req.body;
 
-        // Find the user
         const user = await userSchema.findOne({ uniqueId });
-
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        // Find the books with the provided ISBNs
         const books = await bookSchema.find({ ISBN: { $in: isbn } });
-
         if (books.length === 0) {
             return res.status(404).json({ msg: 'No books found with the provided ISBN' });
         }
 
-        // Remove the books from the user's borrowed array
-        user.borrowed = user.borrowed.filter(book => !isbn.includes(book.isbn));
+        for (const singleIsbn of isbn) {
+            const index = user.borrowed.findIndex(book => book.isbn === singleIsbn);
 
-        // Increase the itemCount of the returned books
-        for (const book of books) {
-            book.ItemCount = 1;
-            await book.save();
+            if (index !== -1) {
+                // Remove only the first match
+                user.borrowed.splice(index, 1);
+
+                // Update book count
+                const book = await bookSchema.findOne({ ISBN: singleIsbn });
+                if (book) {
+                    book.ItemCount += 1;
+                    await book.save();
+                }
+            }
         }
 
-        // Save the updated user
         await user.save();
-
         return res.status(200).json({ msg: 'Books returned successfully' });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ msg: 'Internal Server Error' });
     }
-}
+};
 
 
 exports.removeFromCart = async (req, res) => {
@@ -223,8 +254,21 @@ exports.removeFromCart = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
+        // Check if the book exists in the cart before removing
+        const bookInCart = user.cart.find((book) => book.isbn === isbn);
+        if (!bookInCart) {
+            return res.status(400).json({ msg: 'Book not found in cart' });
+        }
+
         // Remove the book from the user's cart
         user.cart = user.cart.filter((book) => book.isbn !== isbn);
+
+        // Increase ItemCount by 1 in the bookSchema
+        const book = await bookSchema.findOne({ ISBN: isbn });
+        if (book) {
+            book.ItemCount += 1;
+            await book.save();
+        }
 
         // Save the updated user
         await user.save();
@@ -235,6 +279,8 @@ exports.removeFromCart = async (req, res) => {
         return res.status(500).json({ msg: 'Internal Server Error' });
     }
 };
+
+
 
 exports.filter = async (req, res) => {
     try {
@@ -268,37 +314,6 @@ exports.filter = async (req, res) => {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
-
-/*
-exports.booksInCart = async (req, res) => {
-    try {
-        const username = req.params.username;
-
-        // Find the user
-        const user = await userSchema.findOne({ username });
-
-        if (!user) {
-            return res.status(404).json({ msg: 'User not found' });
-        }
-
-        // Extract ISBNs from the user's cart
-        const isbnList = user.cart.map(book => book.isbn);
-
-        // Find the books based on the extracted ISBNs
-        const books = await bookSchema.find({ ISBN: { $in: isbnList } });
-
-        if (books.length === 0) {
-            return res.status(404).json({ msg: 'No books found' });
-        }
-
-        // Send the book details to the client
-        return res.status(200).json({ books });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ msg: 'Internal Server Error' });
-    }
-};*/
-
 exports.booksInCart = async (req, res) => {
     try {
         const username = req.params.username;
@@ -310,18 +325,19 @@ exports.booksInCart = async (req, res) => {
             return res.status(404).json({ msg: "User not found" });
         }
 
-        // If the cart is empty, return an empty array instead of 404
         if (!user.cart || user.cart.length === 0) {
-            return res.status(200).json({ books: [] }); // ✅ Return an empty array
+            return res.status(200).json({ books: [] });
         }
 
-        // Extract ISBNs from the user's cart
-        const isbnList = user.cart.map(book => book.isbn);
+        // Map over each cart entry and fetch the book
+        const books = await Promise.all(
+            user.cart.map(async (item) => {
+                const book = await bookSchema.findOne({ ISBN: item.isbn });
+                return book; // will keep duplicates
+            })
+        );
 
-        // Find the books based on ISBNs
-        const books = await bookSchema.find({ ISBN: { $in: isbnList } });
-
-        return res.status(200).json({ books }); // ✅ Return an empty books array if none are found
+        return res.status(200).json({ books });
     } catch (error) {
         console.error("Error fetching books:", error);
         return res.status(500).json({ msg: "Internal Server Error" });
@@ -336,18 +352,17 @@ exports.allBooksInCart = async (req, res) => {
 
         for (const user of users) {
             if (user.cart && user.cart.length > 0) {
-                const isbnList = user.cart.map(book => book.isbn);
+                for (const cartItem of user.cart) {
+                    const book = await bookSchema.findOne({ ISBN: cartItem.isbn });
 
-                const books = await bookSchema.find({ ISBN: { $in: isbnList } });
-
-                // Attach user info to each book
-                const booksWithUser = books.map(book => ({
-                    ...book._doc,
-                    username: user.username,
-                    userId: user._id,
-                }));
-
-                allCartBooks.push(...booksWithUser);
+                    if (book) {
+                        allCartBooks.push({
+                            ...book._doc,
+                            username: user.username,
+                            userId: user._id,
+                        });
+                    }
+                }
             }
         }
 
@@ -357,6 +372,7 @@ exports.allBooksInCart = async (req, res) => {
         return res.status(500).json({ msg: "Internal Server Error" });
     }
 };
+
 
 
 exports.borrowedBooks = async (req, res) => {
@@ -378,6 +394,7 @@ exports.borrowedBooks = async (req, res) => {
                     uid: user.uniqueId,
                     borrower: user.name,
                     takenDate: book.takenDate,
+                    status: book.status
                 };
 
                 const bookDetails = await bookSchema.findOne({ ISBN: book.isbn });

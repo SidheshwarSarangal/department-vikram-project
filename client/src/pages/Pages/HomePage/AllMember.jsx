@@ -3,195 +3,300 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const AllMember = ({ user }) => {
-  const [data, setData] = useState([]);
-  const [selectedBooks, setSelectedBooks] = useState([]);
-  const navigate = useNavigate();
+  const [userList, setUserList] = useState([]);
+  const [visibleUsers, setVisibleUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
 
+  const [bookList, setBookList] = useState([]);
+  const [queryOptions, setQueryOptions] = useState({ keyword: "-" });
+  const [activePage, setActivePage] = useState(1);
+  const itemsPerPage = 10;
 
-  const addToCart = async () => {
-    const books = selectedBooks;
-    const username = user.username;
-    const send = { books: books, username: username };
-    console.log(send);
-    await axios
-      .post(`http://localhost:5000/addToCart`, send, {})
-      .then((response) => {
-        console.log(response);
-      });
-    setTimeout(() => {
-      window.location.href = "/cart";
-    }, 500);
+  const routeTo = useNavigate();
+
+  const retrieveUsers = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/allUser");
+      const sortedUsers = res.data.sort((a, b) =>
+        a.username.localeCompare(b.username)
+      );
+      setUserList(sortedUsers);
+      setVisibleUsers(sortedUsers);
+    } catch (err) {
+      console.log(err);
+    }
   };
-  // console.log(selectedBooks);
 
-  const fetchData = async () => {
-    // setInterval(async () => {
-    const response = await axios.get("http://localhost:5000/allUser");
-    const sortedData = response.data.sort((a, b) => a.username.localeCompare(b.username));
-    setData(sortedData);
-    // }, 1500);
-  };
-  // console.log(data);
   useEffect(() => {
-    fetchData();
+    retrieveUsers();
   }, []);
 
-  const handleBookClick = (id) => {
-    navigate(`/edit/${id}`);
+  const handleSearch = (e) => {
+    const text = e.target.value.toLowerCase();
+    setSearchTerm(text);
+    const filtered = userList.filter(
+      (u) =>
+        u.username.toLowerCase().includes(text) ||
+        (u.name && u.name.toLowerCase().includes(text))
+    );
+    setVisibleUsers(filtered);
+    setCurrentPage(1);
   };
 
-  const handleCheckboxChange = (e, id) => {
-    if (e.target.checked) {
-      setSelectedBooks((prevSelectedBooks) => [...prevSelectedBooks, id]);
-    } else {
-      setSelectedBooks((prevSelectedBooks) =>
-        prevSelectedBooks.filter((bookId) => bookId !== id)
-      );
-    }
-    console.log(selectedBooks);
+  const handleBookClick = (uid) => {
+    routeTo(`/edit/${uid}`);
   };
 
-  //variables
-  const [currentPage, setCurrentPage] = useState(1);
-  const recordPerPage = 10;
-  const lastIndex = currentPage * recordPerPage;
-  const firstIndex = lastIndex - recordPerPage;
-  const record = data.slice(firstIndex, lastIndex);
-  const npage = Math.ceil(data.length / recordPerPage);
-  const number = [...Array(npage + 1).keys()].slice(1);
+  const startIndex = (currentPage - 1) * usersPerPage;
+  const endIndex = startIndex + usersPerPage;
+  const displayedUsers = visibleUsers.slice(startIndex, endIndex);
 
-  const nextPage = () => {
-    if (currentPage != npage) {
-      setCurrentPage(currentPage + 1);
+  const retrieveBooks = async () => {
+    let keyword = queryOptions.keyword;
+    if (keyword === "") keyword = "-";
+    try {
+      let res = await axios.get(`http://localhost:5000/search/${keyword}`);
+      if (!res.data.books || res.data.books.length === 0) {
+        res = await axios.get(`http://localhost:5000/allBook`);
+      }
+      setBookList(res.data.books || []);
+    } catch (err) {
+      console.log(err);
+      setBookList([]);
     }
   };
-  const prevPage = () => {
-    if (currentPage != 1) {
-      setCurrentPage(currentPage - 1);
-    }
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      retrieveBooks();
+    }, 1500);
+    return () => clearTimeout(timeout);
+  }, [queryOptions]);
+
+  const updateQueryOptions = (e) => {
+    setQueryOptions({ ...queryOptions, [e.target.name]: e.target.value });
   };
+
+  const viewBookDetails = (bookId) => {
+    routeTo(`/book/${bookId}`);
+  };
+
+  const start = (activePage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pagedBooks = bookList.slice(start, end);
 
   return (
     <div
       style={{
         display: "flex",
-        boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
         flexDirection: "column",
         justifyContent: "center",
-        margin: "1rem",
+        alignItems: "center",
+        margin: "1.5rem auto",
         borderRadius: "1.5rem",
-        padding: "0.5rem",
+        padding: "1rem",
+        boxShadow: "1px 1px 21px -3px rgba(0,0,0,0.2)",
+        width: "95%",
+        maxWidth: "1200px",
       }}
     >
-      {data.length > 0 ? (
-        <>
-          
+      <input
+        type="text"
+        placeholder="Search by name or username"
+        value={searchTerm}
+        onChange={handleSearch}
+        style={{
+          width: "50%",
+          padding: "12px 16px",
+          fontSize: "1rem",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          marginBottom: "2rem",
+        }}
+      />
 
-          <div
-            style={{
-              justifyContent: "center",
-              paddingInline: "1rem",
-              marginBlockStart: "1rem",
-              borderRadius: "1.5rem",
-              margin: "0 0rem", // Center it horizontally
+      {/* User Table */}
+      <div style={{ width: "100%", padding: "1rem" }}>
+        <table
+          className="table"
+          style={{
+            borderRadius: "1.5rem",
+            overflow: "hidden",
+            borderCollapse: "separate",
+            borderSpacing: 0,
+            width: "100%",
+          }}
+        >
+          <thead style={{ backgroundColor: "#3d5a80", color: "white" }}>
+            <tr>
+              <th style={{ width: "5rem", textAlign: "left" }}>#</th>
+              <th style={{ width: "15rem", textAlign: "left" }}>Username</th>
+              <th style={{ width: "15rem", textAlign: "left" }}>Name</th>
+              <th style={{ width: "15rem", textAlign: "left" }}>UID</th>
+              <th style={{ width: "15rem", textAlign: "left" }}>Phone</th>
+              <th style={{ width: "15rem", textAlign: "left" }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayedUsers.map((d, i) => (
+              <tr key={d.uniqueId}>
+                <td>{startIndex + i + 1}</td>
+                <td style={{ padding: "0.5rem" }}>{d.username}</td>
+                <td
+                  style={{ cursor: "pointer", padding: "0.5rem" }}
+                  onClick={() => handleBookClick(d.uniqueId)}
+                >
+                  {d.name}
+                </td>
+                <td style={{ padding: "0.5rem" }}>{d.uniqueId}</td>
+                <td style={{ padding: "0.5rem" }}>{d.phone}</td>
+                <td style={{ padding: "0.5rem" }}>
+                  {d.borrowed?.length > 0 ? "Borrowed" : "Not Borrowed"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-
-            }}
-          >
-            <table className="table" style={{
-              borderRadius: "1.5rem",
-              overflow: "hidden",           // ✅ Ensures the radius clips children
-              borderCollapse: "separate",   // ✅ Required for radius to work
-              borderSpacing: 0,             // Optional: removes gaps
-              width: "80%",
-              marginLeft: "2rem"
-            }}>
-              <thead style={{ backgroundColor: "#3d5a80", color: "white" }}>
-                <th style={{ width: "5rem", textAlign: "left" }}>#</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Username</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Name</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>UID</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Phone</th>
-                <th style={{ width: "15rem", textAlign: "left" }}>Status</th>
-              </thead>
-              <tbody>
-                {record.map((d, i) => (
-                  <tr>
-                    <td style={{}}>{(currentPage - 1) * 10 + i + 1}</td>
-                    <td style={{ padding: "0.5rem" }}>{d.username}</td>
-                    <td
-                      style={{ cursor: "pointer", padding: "0.5rem" }}
-                      onClick={() => handleBookClick(d.uniqueId)}
-                      key={i}
-                    >
-                      {d.name}
-                    </td>
-                    <td style={{ padding: "0.5rem" }}>{d.uniqueId}</td>
-                    <td style={{ padding: "0.5rem" }}>{d.phone}</td>
-                    <td style={{ padding: "0.5rem" }}>
-                      {d.borrowed.length == 0 ? (
-                        <>Not Borrowed</>
-                      ) : (
-                        <>Borrowed</>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div
-            style={{
-              textAlign: "center",
-              marginBlockStart: "2rem",
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "left",
-              margin: "2rem 2rem", // Center it horizontally
-            }}
-          >
-            <div
-              className="land-button lists-button"
-              style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
-              onClick={prevPage}
-            >
-              <a
-                className="landing-button-hover"
-                style={{ width: "5rem", margin: "10px" }}
-              >
-                <span>PREV</span>
-              </a>
-            </div>
-
-            <div style={{ paddingBlockStart: "1rem" }}>{currentPage}</div>
-            <div
-              className="land-button"
-              style={{ margin: "0 1rem", padding: "0", cursor: "pointer" }}
-              onClick={nextPage}
-            >
-              <a
-                className="landing-button-hover"
-                style={{ width: "5rem", margin: "10px" }}
-              >
-                <span>NEXT</span>
-              </a>
-            </div>
-          </div>
-          <div
-            style={{
-              marginLeft: "45rem",
-              // marginBlockEnd: "2rem",
-            }}
-          ></div>
-        </>
-      ) : (
-        <div className="loaders book">
-          <figure className="page"></figure>
-          <figure className="page"></figure>
-          <figure className="page"></figure>
+      {/* User Pagination */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "1.5rem",
+          marginTop: "2rem",
+        }}
+      >
+        <div
+          className="land-button lists-button"
+          style={{ cursor: "pointer" }}
+          onClick={() => setCurrentPage((p) => p - 1)}
+        >
+          <a className="landing-button-hover" style={{ padding: "10px 20px" }}>
+            <span>PREV</span>
+          </a>
         </div>
-      )}
+
+        <div style={{ fontSize: "1.1rem",  marginInline:"-7rem", marginTop:"1.5rem" }}>{currentPage}</div>
+
+        <div
+          className="land-button"
+          style={{ cursor: "pointer" }}
+          onClick={() => setCurrentPage((p) => p + 1)}
+        >
+          <a className="landing-button-hover" style={{ padding: "10px 20px" }}>
+            <span>NEXT</span>
+          </a>
+        </div>
+      </div>
+
+      {/* Book Search */}
+      <div
+        style={{
+          margin: "2rem 0",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <input
+          type="text"
+          name="keyword"
+          className="login-input"
+          placeholder="Search Books"
+          onChange={updateQueryOptions}
+          style={{
+            width: "50%",
+            padding: "12px 16px",
+            fontSize: "1rem",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            outline: "none",
+          }}
+        />
+      </div>
+
+      {/* Book Table */}
+      <div style={{ width: "100%", padding: "1rem" }}>
+        <table
+          className="table"
+          style={{
+            borderRadius: "1.5rem",
+            overflow: "hidden",
+            borderCollapse: "separate",
+            borderSpacing: 0,
+            width: "100%",
+          }}
+        >
+          <thead style={{ backgroundColor: "#3d5a80", color: "white" }}>
+            <tr>
+              <th style={{ width: "5rem", textAlign: "left" }}>#</th>
+              <th style={{ width: "20rem", textAlign: "left" }}>Title</th>
+              <th style={{ width: "20rem", textAlign: "left" }}>Publisher</th>
+              <th style={{ width: "15rem", textAlign: "left" }}>Genre</th>
+              <th style={{ width: "10rem", textAlign: "left" }}>
+                Copies Available
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {pagedBooks.map((book, index) => (
+              <tr key={book.ISBN || index}>
+                <td>{start + index + 1}</td>
+                <td
+                  className="clickable"
+                  onClick={() => viewBookDetails(book.Title)}
+                  style={{ padding: "0.5rem", cursor: "pointer" }}
+                >
+                  {book.Title}
+                </td>
+                <td style={{ padding: "0.5rem" }}>{book.Author}</td>
+                <td style={{ padding: "0.5rem" }}>{book.Genre}</td>
+                <td style={{ padding: "0.5rem" }}>{book.ItemCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Book Pagination */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "1.5rem",
+          margin: "2rem 0",
+        }}
+      >
+        <div
+          className="land-button lists-button"
+          style={{ cursor: "pointer" }}
+          onClick={() => setActivePage((p) => p - 1)}
+        >
+          <a className="landing-button-hover" style={{ padding: "10px 10px" }}>
+            <span>PREV</span>
+          </a>
+        </div>
+
+        <div style={{ fontSize: "1.1rem" , marginInline:"-7rem", marginTop:"1.5rem"}}>{activePage}</div>
+
+        <div
+          className="land-button"
+          style={{ cursor: "pointer" }}
+          onClick={() => setActivePage((p) => p + 1)}
+        >
+          <a className="landing-button-hover" style={{ padding: "10px 10px" }}>
+            <span>NEXT</span>
+          </a>
+        </div>
+      </div>
     </div>
   );
 };
+
 export default AllMember;

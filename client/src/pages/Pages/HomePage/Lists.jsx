@@ -112,14 +112,16 @@ const Lists = ({ user }) => {
   };
 
   const handleCheckboxChange = (e, id) => {
-    if (e.target.checked) {
-      setSelectedBooks((prevSelectedBooks) => [...prevSelectedBooks, id]);
-    } else {
-      setSelectedBooks((prevSelectedBooks) =>
-        prevSelectedBooks.filter((bookId) => bookId !== id)
-      );
-    }
-    console.log(selectedBooks);
+    setSelectedBooks((prevSelectedBooks) => {
+      if (e.target.checked) {
+        // Only add if it's not already present
+        return prevSelectedBooks.includes(id)
+          ? prevSelectedBooks
+          : [...prevSelectedBooks, id];
+      } else {
+        return prevSelectedBooks.filter((bookId) => bookId !== id);
+      }
+    });
   };
 
   //variables
@@ -167,10 +169,21 @@ const Lists = ({ user }) => {
                 className="login-input"
                 placeholder="Search Books"
                 name="search"
-                style={{ width: "40%", marginInlineStart: "5rem" }}
                 onChange={(e) => handleInputs(e)}
+                style={{
+                  width: "50%",
+                  padding: "12px 16px",
+                  marginInlineStart: "5rem",
+                  fontSize: "1rem",
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  outline: "none",
+                  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
+                  transition: "border-color 0.3s, box-shadow 0.3s",
+                }}
               />
             </div>
+
             <div
               style={{
                 justifyContent: "center",
@@ -218,6 +231,8 @@ const Lists = ({ user }) => {
               </div>
 
             </div>
+
+
             <div
               style={{
                 textAlign: "left",
@@ -255,6 +270,7 @@ const Lists = ({ user }) => {
                 </a>
               </div>
             </div>
+
             <div
               style={{
                 marginLeft: "-1.6rem",

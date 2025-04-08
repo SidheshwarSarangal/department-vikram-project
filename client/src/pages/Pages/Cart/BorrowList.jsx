@@ -14,6 +14,10 @@ const BorrowList = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
+  const [originalData, setOriginalData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+
 
   const handleCheckoutClick = (username) => {
     setCurrentUser(username);
@@ -52,18 +56,27 @@ const BorrowList = () => {
     try {
       setLoading(true);
       const response = await axios.get("http://localhost:5000/borrowedBooks");
+      let result = [];
+
       if (Array.isArray(response.data)) {
-        const sortedData = response.data.sort((a, b) =>
-          a.borrower.localeCompare(b.borrower)
-        );
-        setData(sortedData);
+        result = response.data;
       } else if (Array.isArray(response.data.borrowedBooks)) {
-        setData(response.data.borrowedBooks);
+        result = response.data.borrowedBooks;
       } else {
         console.warn("Unexpected format:", response.data);
-        setData([]);
       }
-      console.log(response);
+
+      // ✅ Sort: "returning" status first, then by borrower name
+      result.sort((a, b) => {
+        if (a.status === "returning" && b.status !== "returning") return -1;
+        if (a.status !== "returning" && b.status === "returning") return 1;
+        return a.borrower.localeCompare(b.borrower); // fallback sort
+      });
+
+      console.log(result);
+
+      setOriginalData(result);
+      setData(result);
     } catch (err) {
       console.error("Error fetching borrowed books:", err);
       setData([]);
@@ -71,6 +84,26 @@ const BorrowList = () => {
       setLoading(false);
     }
   };
+
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    if (!query) {
+      setData(originalData); // Reset if input is empty
+      return;
+    }
+
+    const filtered = originalData.filter((item) =>
+      item.borrower?.toLowerCase().includes(query) ||
+      item.title?.toLowerCase().includes(query) ||
+      item.author?.toLowerCase().includes(query)
+    );
+
+    setData(filtered);
+  };
+
 
 
   useEffect(() => {
@@ -118,23 +151,20 @@ const BorrowList = () => {
     }
   };
 
-  const proceedCheckout = async (username) => {
-    const send = { username };
+  const proceedCheckout = async (username, isbn) => {
+    const send = { username, isbn };
     try {
       const response = await axios.post(`http://localhost:5000/checkout`, send);
       console.log("Checkout response:", response);
 
-      toast.success(`Checkout successful for ${username}`, {
+      toast.success(`Checked out book ISBN: ${isbn}`, {
         position: "top-center",
         autoClose: 2000,
         pauseOnHover: false,
-        pauseOnFocusLoss: false,
         draggable: true,
-        textAlign: "center",
       });
 
-
-      // Optional delay before reload so user can read the toast
+      // Optional delay before reload so user can see update
       setTimeout(() => {
         window.location.reload();
       }, 2500);
@@ -147,6 +177,37 @@ const BorrowList = () => {
       });
     }
   };
+
+  const handleAcceptReturn = async (book) => {
+    try {
+      const payload = {
+        uniqueId: book.uid,
+        isbn: [book.isbn], // Send as array
+      };
+
+      const response = await axios.post("http://localhost:5000/returnBooks", payload);
+
+      if (response.status === 200) {
+        toast.success("Book marked as returned!", {
+          position: "top-center",
+          autoClose: 2000,
+          pauseOnHover: false,
+          pauseOnFocusLoss: false,
+          draggable: true,
+        });
+
+        // Optional: refresh data or page
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Error accepting return:", error);
+      toast.error("Failed to accept return.");
+    }
+  };
+
+
 
 
 
@@ -234,7 +295,45 @@ const BorrowList = () => {
         </button>
       </div>
 
+      <h1
+        style={{
+          fontSize: "2rem",
+          fontWeight: "600",
+          color: "white",
+          marginBottom: "1.5rem",
+          marginTop: "1rem",
+          marginLeft: "2rem"
+        }}
+      >
+        Borrowers' List
+      </h1>
 
+
+      <input
+        type="text"
+        placeholder="Search by username, book, or author"
+        value={searchQuery}
+        onChange={handleSearch}
+        style={{
+          width: "50%",
+          padding: "12px 16px",
+          marginLeft: "2rem",
+          fontSize: "1rem",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          outline: "none",
+          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
+          transition: "border-color 0.3s, box-shadow 0.3s",
+        }}
+        onFocus={(e) => {
+          e.target.style.borderColor = "#3f51b5";
+          e.target.style.boxShadow = "0 0 0 3px rgba(63, 81, 181, 0.1)";
+        }}
+        onBlur={(e) => {
+          e.target.style.borderColor = "#ccc";
+          e.target.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.05)";
+        }}
+      />
 
 
 
@@ -245,15 +344,18 @@ const BorrowList = () => {
           <figure className="page"></figure>
         </div>
       ) : data.length === 0 ? (
-        <div style={{ textAlign: "center", fontSize: "1.5rem", padding: "2rem" }}>
-          📚 Nothing in Checklist
+        <div className="admin-table-borrow">
+
+          <div style={{ textAlign: "center", fontSize: "1.5rem", padding: "2rem" }}>
+            📚 Nothing in Checklist
+          </div>
         </div>
       ) : (
         <div className="lists-responsive-container">
 
-
-
           <div className="admin-table-borrow">
+
+
             <div className="table-container">
               <table className="table">
                 <thead>
@@ -264,6 +366,7 @@ const BorrowList = () => {
                     <th>Book Name</th>
                     <th>Author</th>
                     <th>Due/Borrowed Date</th>
+                    <th>Status</th> {/* New Column */}
                   </tr>
                 </thead>
                 <tbody>
@@ -275,12 +378,31 @@ const BorrowList = () => {
                       <td>{d.title}</td>
                       <td>{d.author}</td>
                       <td>{formatDate(d.takenDate)}</td>
-
+                      <td>
+                        {d.status === "returning" ? (
+                          <button
+                            onClick={() => handleAcceptReturn(d)}
+                            style={{
+                              padding: "0.5rem 1rem",
+                              backgroundColor: "#2a9d8f",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "0.4rem",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Accept Return
+                          </button>
+                        ) : (
+                          <div style={{ fontWeight: "bold", color: "#555" }}>Borrowed</div>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
 
 
             <div
@@ -348,24 +470,7 @@ const BorrowList = () => {
         >
           🛒 Check List
         </h1>
-        <div
-          style={{
-            backgroundColor: "#fff4e5",
-            color: "#663c00",
-            width: "50%",
-            border: "1px solid #ffcc80",
-            borderRadius: "0.75rem",
-            padding: "1rem 1.5rem",
-            marginTop: "1rem",
-            marginLeft: "4rem",
-            fontWeight: "500",
-            textAlign: "left",
-            fontFamily: "Segoe UI, Tahoma, Geneva, Verdana, sans-serif",
-            color: "red"
-          }}
-        >
-          First REMOVE the books which cannot be checked out and then do the CHECKOUT for that user.
-        </div>
+
 
         {cartBooks.length > 0 ? (
           <div
@@ -441,51 +546,28 @@ const BorrowList = () => {
                           </button>
                         </td>
                         <td style={{ padding: "1rem" }}>
-                          {showCheckout && (
-                            <button
-                              style={{
-                                padding: "0.4rem 1rem",
-                                backgroundColor: "#3d5a80",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "0.5rem",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => handleCheckoutClick(book.username)}
-                            >
-                              Checkout
-                            </button>
-                          )}
+                          <button
+                            style={{
+                              padding: "0.4rem 1rem",
+                              backgroundColor: "#3d5a80",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "0.5rem",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => proceedCheckout(book.username, book.ISBN)}
+                          >
+                            Checkout
+                          </button>
                         </td>
-
                       </tr>
+
                     );
                   });
                 })()}
               </tbody>
             </table>
 
-            {showPopup && currentUser && (
-              <div className="popup-overlay">
-                <div className="popup">
-                  <p>All the books for <strong>{currentUser}</strong> will be checked out together. So make sure youremoved the ones which cannot be borrowed. Do You want to checkout them all?</p>
-                  <div style={{ marginTop: "1rem" }}>
-                    <button
-                      onClick={() => proceedCheckout(currentUser)}
-                      className="confirm-btn"
-                    >
-                      Yes
-                    </button>
-                    <button
-                      onClick={() => setShowPopup(false)}
-                      className="cancel-btn"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
 
           </div>
         ) : (

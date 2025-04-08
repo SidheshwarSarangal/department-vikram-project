@@ -28,6 +28,7 @@ router.get("/filter/:genre/:year/:title", bookController.filter);
 router.get("/booksInCart/:username", bookController.booksInCart);
 router.get("/borrowedBooks", bookController.borrowedBooks);
 router.get("/allBooksInCart", bookController.allBooksInCart);
+router.post("/returnStatusBook", bookController.returnStatusBook);
 
 //feedback
 router.post("/addFeedback", feedbackController.addFeedback);

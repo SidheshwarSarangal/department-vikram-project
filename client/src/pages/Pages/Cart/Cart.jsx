@@ -40,6 +40,7 @@ const Cart = ({ user }) => {
       });
 
       setBorrowedBooks(userBooks);
+      console.log("borrowedbooks", userBooks);
     } catch (error) {
       console.error("Error fetching borrowed books:", error);
       setBorrowedBooks([]);
@@ -70,14 +71,15 @@ const Cart = ({ user }) => {
   const handleReturn = async (book) => {
     try {
       const payload = {
-        uniqueId: book.uid,
-        isbn: [book.isbn],
+        uniqueId: user.uniqueId,  // ✅ use uniqueId, not username
+        isbn: book.isbn,
       };
       console.log("payload", payload);
 
-      const response = await axios.post("http://localhost:5000/returnBooks", payload);
+      const response = await axios.post("http://localhost:5000/returnStatusBook", payload);
 
       if (response.status === 200) {
+        console.log(response);
         toast.success("Book returned successfully!", {
           position: "top-center",
           autoClose: 2000,
@@ -312,29 +314,46 @@ const Cart = ({ user }) => {
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => handleReturn(book)}
-                      style={{
-                        padding: "1rem 1.4rem",
-                        backgroundColor: "transparent",
-                        color: "white",
-                        border: "1px solid white",
-                        borderRadius: "0.4rem",
-                        cursor: "pointer",
-                        fontSize: "0.9rem",
-                        transition: "all 0.3s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = "white";
-                        e.target.style.color = "black";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = "transparent";
-                        e.target.style.color = "white";
-                      }}
-                    >
-                      Return
-                    </button>
+                    {book.status === "returning" ? (
+                      <div
+                        style={{
+                          padding: "1rem 1.4rem",
+                          backgroundColor: "#ffe0b2",
+                          color: "#333",
+                          borderRadius: "0.4rem",
+                          fontWeight: "bold",
+                          fontSize: "0.9rem",
+                          textAlign: "center",
+                        }}
+                      >
+                        Returning
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleReturn(book)}
+                        style={{
+                          padding: "1rem 1.4rem",
+                          backgroundColor: "transparent",
+                          color: "white",
+                          border: "1px solid white",
+                          borderRadius: "0.4rem",
+                          cursor: "pointer",
+                          fontSize: "0.9rem",
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = "white";
+                          e.target.style.color = "black";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = "transparent";
+                          e.target.style.color = "white";
+                        }}
+                      >
+                        Return
+                      </button>
+                    )}
+
 
 
                   </div>
