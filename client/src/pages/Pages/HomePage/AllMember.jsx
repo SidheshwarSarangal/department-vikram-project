@@ -77,6 +77,7 @@ const AllMember = ({ user }) => {
 
   const updateQueryOptions = (e) => {
     setQueryOptions({ ...queryOptions, [e.target.name]: e.target.value });
+    setActivePage(1); // 🔁 Reset book pagination to page 1
   };
 
   const viewBookDetails = (bookId) => {
@@ -207,7 +208,7 @@ const AllMember = ({ user }) => {
           type="text"
           name="keyword"
           className="login-input"
-          placeholder="Search Books"
+          placeholder="Book name, author, publication year or publisher"
           onChange={updateQueryOptions}
           style={{
             width: "50%",
@@ -236,10 +237,10 @@ const AllMember = ({ user }) => {
             <tr>
               <th style={{ width: "5rem", textAlign: "left" }}>#</th>
               <th style={{ width: "20rem", textAlign: "left" }}>Title</th>
-              <th style={{ width: "20rem", textAlign: "left" }}>Publisher</th>
-              <th style={{ width: "15rem", textAlign: "left" }}>Genre</th>
+              <th style={{ width: "20rem", textAlign: "left" }}>Author</th>
+              <th style={{ width: "15rem", textAlign: "left" }}>Publication Year</th>
               <th style={{ width: "10rem", textAlign: "left" }}>
-                Copies Available
+                Publisher
               </th>
             </tr>
           </thead>
@@ -256,7 +257,7 @@ const AllMember = ({ user }) => {
                 </td>
                 <td style={{ padding: "0.5rem" }}>{book.Author}</td>
                 <td style={{ padding: "0.5rem" }}>{book.Genre}</td>
-                <td style={{ padding: "0.5rem" }}>{book.ItemCount}</td>
+                <td style={{ padding: "0.5rem" }}>{book.Publisher || "unknown" }</td>
               </tr>
             ))}
           </tbody>

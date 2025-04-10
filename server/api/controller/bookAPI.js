@@ -1,11 +1,69 @@
 const bookSchema = require("../models/books");
 const userSchema = require("../models/user");
 
+
+//const bookSchema = require('../models/book'); // adjust path as needed
+
+exports.bulkAddBooks = async (req, res) => {
+  try {
+    const books = req.body;
+
+    if (!Array.isArray(books) || books.length === 0) {
+      return res.status(400).json({ msg: 'No books to add.' });
+    }
+
+    const bulkOps = books.map(book => {
+      // Ensure all fields exist as strings, defaulting to ''
+      const BibNum = String(book.BibNum || '');
+      const ISBN = String(book.ISBN || '');
+      const Title = String(book['Title '] || ''); // Note the space in "Title "
+      const Author = String(book.Author || '');
+      const Publisher = String(book.Publisher || '');
+      const Genre = String(book.Genre || '');
+      const Volume = String(book.Volume || '');
+
+      if (!ISBN || !Title) return null;
+
+      return {
+        updateOne: {
+          filter: { ISBN },
+          update: {
+            $setOnInsert: {
+              BibNum,
+              ISBN,
+              Title,
+              Author,
+              Publisher,
+              Genre,
+              Volume,
+              ItemCount: '1'
+            }
+          },
+          upsert: true
+        }
+      };
+    }).filter(Boolean); // remove nulls
+
+    if (bulkOps.length === 0) {
+      return res.status(400).json({ msg: 'No valid books to process.' });
+    }
+
+    const result = await bookSchema.bulkWrite(bulkOps);
+    return res.status(200).json({ msg: 'Books processed successfully', result });
+
+  } catch (error) {
+    console.error('Bulk insert error:', error);
+    return res.status(500).json({ msg: 'Internal server error', error });
+  }
+};
+
+
+
 exports.addBook = async (req, res) => {
     try {
         const BibNum = req.body.BibNum;
         const Title = req.body.Title;
-        const ItemCount = req.body.ItemCount;
+        const ItemCount = "1";
         // const password = req.body.password
         const Author = req.body.Author;
         const ISBN = req.body.ISBN;
@@ -59,7 +117,8 @@ exports.searchBooks = async (req, res) => {
             $or: [
                 { Title: { $regex: regex } },
                 { Author: { $regex: regex } }, // Make sure this field exists in your schema
-                { Genre: { $regex: regex } }   // Same here
+                { Genre: { $regex: regex } },   // Same here
+                { Publisher: { $regex: regex } }
             ]
         });
 
@@ -101,8 +160,8 @@ exports.addToCart = async (req, res) => {
             console.log(book)
             if (book.ItemCount > 0) {
                 // Decrease item count of the book
-                book.ItemCount -= 1;
-                await book.save();
+                //book.ItemCount -= 1;
+                //await book.save();
 
                 // Add ISBN to user's cart
                 // user.cart.push(ISBN);
@@ -147,9 +206,9 @@ exports.checkout = async (req, res) => {
             return res.status(404).json({ msg: "Book not found in inventory" });
         }
 
-        if (book.ItemCount <= 0) {
-            return res.status(400).json({ msg: "Book is out of stock" });
-        }
+       // if (book.ItemCount <= 0) {
+         //   return res.status(400).json({ msg: "Book is out of stock" });
+        //}
 
         // Update inventory
         //book.ItemCount -= 1;
@@ -227,10 +286,10 @@ exports.returnBooks = async (req, res) => {
 
                 // Update book count
                 const book = await bookSchema.findOne({ ISBN: singleIsbn });
-                if (book) {
-                    book.ItemCount += 1;
-                    await book.save();
-                }
+                //if (book) {
+                  //  book.ItemCount += 1;
+                    //await book.save();
+                //}
             }
         }
 
@@ -265,10 +324,10 @@ exports.removeFromCart = async (req, res) => {
 
         // Increase ItemCount by 1 in the bookSchema
         const book = await bookSchema.findOne({ ISBN: isbn });
-        if (book) {
-            book.ItemCount += 1;
-            await book.save();
-        }
+       // if (book) {
+         //   book.ItemCount += 1;
+         //   await book.save();
+        //}
 
         // Save the updated user
         await user.save();

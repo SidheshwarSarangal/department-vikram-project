@@ -17,7 +17,7 @@ const FeedbackTable = ({ user }) => {
             ? await axios.get('http://localhost:5000/getAllFeedbacks')
             : await axios.get(`http://localhost:5000/getUserFeedbacks/${user.username}`);
         setFeedbackList(response.data);
-        console.log("responsetable",response);
+        console.log("responsetable", response);
       } catch (error) {
         console.error('Error fetching feedback:', error);
       }
@@ -35,7 +35,7 @@ const FeedbackTable = ({ user }) => {
       } else if (newStatus === 'rejected and closed') {
         endpoint = `http://localhost:5000/feedbackReject/${id}`;
       }
-      else{
+      else {
         endpoint = `http://localhost:5000/makeStatusSubmitted/${id}`;
       }
 
@@ -80,7 +80,7 @@ const FeedbackTable = ({ user }) => {
       setTimeout(() => {
         window.location.reload();
       }, 1500); // wait 1.5 seconds before reloadingff
-      
+
     }
   };
 
@@ -176,7 +176,7 @@ const FeedbackTable = ({ user }) => {
           <div className="popup-content" onClick={(e) => e.stopPropagation()}>
             <h3>Full Query from {selectedFeedback.username}</h3>
             <p>{selectedFeedback.feedback}</p>
-            <span onClick={handlePopupClose} className="profile-button" style={{color:"gray", ":hover": { color: "white" }}}>Close</span>
+            <span onClick={handlePopupClose} className="profile-button" style={{ color: "gray", ":hover": { color: "white" } }}>Close</span>
           </div>
         </div>
       )}

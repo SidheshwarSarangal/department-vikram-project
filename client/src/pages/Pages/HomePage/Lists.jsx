@@ -82,6 +82,7 @@ const Lists = ({ user }) => {
 
       // If still no books, set data to an empty array to prevent infinite loading
       setData(response.data.books || []);
+      setCurrentPage(1); // 👈 Add this line to reset the page to 1 on new search
     } catch (error) {
       console.error("Error fetching books:", error);
       setData([]); // Ensure data does not remain undefined
@@ -165,7 +166,7 @@ const Lists = ({ user }) => {
               <input
                 type="text"
                 className="login-input"
-                placeholder="Search Books"
+                placeholder="Book name, author, publication year or publisher"
                 name="search"
                 onChange={(e) => handleInputs(e)}
                 style={{
@@ -195,9 +196,9 @@ const Lists = ({ user }) => {
                     <tr>
                       <th style={{ width: "5rem" }}>#</th>
                       <th style={{ width: "15rem" }}>Name</th>
+                      <th style={{ width: "15rem" }}>Author</th>
+                      <th style={{ width: "15rem" }}>Publication Year</th>
                       <th style={{ width: "15rem" }}>Publisher</th>
-                      <th style={{ width: "15rem" }}>Genre</th>
-                      <th style={{ width: "15rem" }}>Copies Available</th>
                       <th style={{ width: "10rem" }}>Add To Cart</th>
                     </tr>
                   </thead>
@@ -213,7 +214,7 @@ const Lists = ({ user }) => {
                         </td>
                         <td>{d.Author || "Unknown Author"}</td>
                         <td>{d.Genre || "Uncategorized"}</td>
-                        <td>{d.ItemCount || "0"}</td>
+                        <td>{d.Publisher || "Unknown"}</td>
                         <td>
                           <input
                             type="checkbox"

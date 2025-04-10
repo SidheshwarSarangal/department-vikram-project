@@ -71,7 +71,7 @@ const BorrowList = () => {
         return a.borrower.localeCompare(b.borrower); // fallback sort
       });
 
-
+      setCurrentPage(1);
       setOriginalData(result);
       setData(result);
     } catch (err) {
