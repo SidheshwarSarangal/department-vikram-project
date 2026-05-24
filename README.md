@@ -55,6 +55,8 @@ cd client
 npm start
 ```
 
+Note: in the client folder, please add DB_URL with appropriate url of the database.
+
 ## Landing Page
 
 Here you can ckick on GO!! to move to login/signup page
