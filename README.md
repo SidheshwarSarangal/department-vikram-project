@@ -55,7 +55,7 @@ cd client
 npm start
 ```
 
-Note: in the client folder, please add DB_URL with appropriate url of the database.
+Note: In the Server folder, please add DB_URL with appropriate url of the database.
 
 ## Landing Page
 
