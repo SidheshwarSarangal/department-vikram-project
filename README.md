@@ -50,8 +50,12 @@ Now in the web browser, go the the following and do the sign up -
 https://account.mongodb.com/account/login
 ```
 
-Go to projects on the top and create a new project.Name it and then click next. Now click on create project. Now you will see create (cluster) button. Select the Free option among the three slides which will appear. Scroll down. You will see AWS to be selected. Scroll down and just click the button creat the create deployment. Now connect to cluster window will pop out of screen. there click Add Current IP Address button. Give a username and password and please note it down. Click on create database. Next click choose a connection method. Select compass. Select "I have MongoDB Compass installed". Select the line appearing below which will appear somewhat like this "mongodb+srv://sidh:<db_password>@cluster0.2klmcmr.mongodb.net/" and then click copy. now just click done.
-Now you have to open vs code. there open the .env file inside the server. and then type DB_UR=(paste here what you copied and put the password which you set like this)mongodb+srv://sidh:<db_password>@cluster0.2klmcmr.mongodb.net/. Then do ctrl + s to save the file. In the browser where you had the mongodb website opened, there click on the Database and Network access on the left bar. Select IP address list on the left side bar. Click +add new IP Address and then type 0.0.0.0 in the access entry list and then click confirm.
+- Go to projects on the top and create a new project.Name it and then click next. 
+- Now click on create project. Now you will see create (cluster) button. Select the Free option among the three slides which will appear. Scroll down. You will see AWS to be selected. Scroll down and just click the button creat the create deployment.
+-  Now connect to cluster window will pop out of screen. there click Add Current IP Address button. Give a username and password and please note it down. Click on create database. Next click choose a connection method. Select compass.
+-  Select "I have MongoDB Compass installed". Select the line appearing below which will appear somewhat like this "mongodb+srv://sidh:<db_password>@cluster0.2klmcmr.mongodb.net/" and then click copy. now just click done.
+Now you have to open vs code. there open the .env file inside the server. and then type DB_UR=(paste here what you copied and put the password which you set like this)mongodb+srv://sidh:<db_password>@cluster0.2klmcmr.mongodb.net/.
+- Then do ctrl + s to save the file. In the browser where you had the mongodb website opened, there click on the Database and Network access on the left bar. Select IP address list on the left side bar. Click +add new IP Address and then type 0.0.0.0 in the access entry list and then click confirm.
 
 Now just go to the terminal of the vs code for the server and then just do this and press enter 
 
@@ -73,8 +77,10 @@ Now there itselft do this
 npm start
 ```
 
-Now a window will open in the browser automatically, showing that the website is running locally. there move to the signup option and create a account with email ending with @bt.iitr.ac.in. and use it sign in. Now for admin, create another account. But for this, you have to go to the mongodb website in the browser, click on browse collections. Click on browse collections.click on test and then users. you will see the list of the users. there, for that user, click on the pen button and then edit the userType from user to admin and then save the changes.
-So till here, all the things have been done. you can sign in with user and admin differently to see how the they both work.
+- Now a window will open in the browser automatically, showing that the website is running locally.
+- there move to the signup option and create a account with email ending with @bt.iitr.ac.in. and use it sign in.
+- Now for admin, create another account. But for this, you have to go to the mongodb website in the browser, click on browse collections. Click on browse collections.click on test and then users. you will see the list of the users. there, for that user, click on the pen button and then edit the userType from user to admin and then save the changes.
+- So till here, all the things have been done. you can sign in with user and admin differently to see how the they both work.
 
 
 ---
