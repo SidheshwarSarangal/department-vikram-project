@@ -1,61 +1,84 @@
-# DevRev On-Campus Project Round
+# Run Locally
 
-Library Management using MERN is a full-stack web application that allows users to manage books, borrowers, and borrowing transactions in a library setting. It utilizes the MERN stack, which includes MongoDB for the database, Express.js for the server, React.js for the frontend, and Node.js for the backend. With this application, users can perform operations such as adding new books, tracking borrowed books, managing borrower details, and generating reports. The application provides an intuitive and user-friendly interface for efficient library management.
+First install the nodejs, in the following link, click on the windows installer .msi(may be present on the bottom left in the link) -
 
-## Tech Stack
+```bash
+https://nodejs.org/en/download
+```
 
-**Client:** React, Redux
+Then install the vs code(this is the code editor) -
 
-**Server:** Node, Express , Passport JS , PassportJs
+```bash
+https://code.visualstudio.com/
+```
 
-## Features
+Now install git -
 
-- User Registration and Authentication
-- Book Catalog
-- Book Search and Filters
-- Borrowing and Return Management
-- User Profile Management
-- Administrative Dashboard
-- Integration with External APIs
+```bash
+https://git-scm.com/?utm_source=chatgpt.com
+```
 
-## Run Locally
+Now create a new blank folder on the desktop, and open vs code. Go to files option and click open folder. Now browse to desktop and select the new blank folder which you created.
+Now, go to terminal option on the top right and then click on new terminal in the vs code.
 
-move into LibraryManagement folder
+A terminal window will appear on the bottom. there type the following line and press enter - 
+
+```bash
+git clone https://git-scm.com/?utm_source=chatgpt.com
+```
+
+Now, now in that terminal type the following(moving into LibraryManagement) 
 
 ```bash
 cd LibraryManagement
 ```
 
-move into server and install node dependencies for server side
+Similarly open a new terminal with the above two steps. Two terminals are required for handling the two aspect(front and back)
+You will get all the terminals on the right side of the terminal.
+
+Now in one terminal do this(Move into server and install node dependencies for server side)
 
 ```bash
 cd server
 npm i
 ```
 
-install react dependencies in client folder
+On the left side of the vs code, you will see the folder structure. There inside the server, create a new file called .env.
+Now in the web browser, go the the following and do the sign up -
 
 ```bash
-cd ..
-cd client
-npm i
+https://account.mongodb.com/account/login
 ```
 
-run node backend in other shell
+Go to projects on the top and create a new project.Name it and then click next. Now click on create project. Now you will see create (cluster) button. Select the Free option among the three slides which will appear. Scroll down. You will see AWS to be selected. Scroll down and just click the button creat the create deployment. Now connect to cluster window will pop out of screen. there click Add Current IP Address button. Give a username and password and please note it down. Click on create database. Next click choose a connection method. Select compass. Select "I have MongoDB Compass installed". Select the line appearing below which will appear somewhat like this "mongodb+srv://sidh:<db_password>@cluster0.2klmcmr.mongodb.net/" and then click copy. now just click done.
+Now you have to open vs code. there open the .env file inside the server. and then type DB_UR=(paste here what you copied and put the password which you set like this)mongodb+srv://sidh:<db_password>@cluster0.2klmcmr.mongodb.net/. Then do ctrl + s to save the file. In the browser where you had the mongodb website opened, there click on the Database and Network access on the left bar. Select IP address list on the left side bar. Click +add new IP Address and then type 0.0.0.0 in the access entry list and then click confirm.
+
+Now just go to the terminal of the vs code for the server and then just do this and press enter 
+
+```bash
+npm start
+```
+See if there appear any error. else all good up till now.
+
+Now in the another terminal move the client folder in the similar way and do install react dependencies in client folder like this
+
+```bash
+cd client
+npm install --legacy-peer-deps 
+```
+
+Now there itselft do this
 
 ```bash
 npm start
 ```
 
-run react frontend in third shell
+Now a window will open in the browser automatically, showing that the website is running locally. there move to the signup option and create a account with email ending with @bt.iitr.ac.in. and use it sign in. Now for admin, create another account. But for this, you have to go to the mongodb website in the browser, click on browse collections. Click on browse collections.click on test and then users. you will see the list of the users. there, for that user, click on the pen button and then edit the userType from user to admin and then save the changes.
+So till here, all the things have been done. you can sign in with user and admin differently to see how the they both work.
 
-```bash
-cd ..
-cd client
-npm start
-```
 
-Note: In the Server folder, please add DB_URL with appropriate url of the database.
+---
+
 
 ## Landing Page
 
